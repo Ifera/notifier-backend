@@ -1,0 +1,6 @@
+{
+  "name": "test",
+  "mongo_db": "mongodb://localhost:27017/notifier_test",
+  "jwt_private_key": "abcd1234",
+  "db_type": "mongodb"
+}

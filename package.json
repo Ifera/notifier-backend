@@ -1,0 +1,43 @@
+{
+  "name": "notifier",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "lint": "eslint --fix main.js",
+    "format": "prettier -w .",
+    "prod": "NODE_ENV=production node main.js",
+    "dev": "NODE_ENV=development nodemon main.js",
+    "test": "NODE_ENV=test jest --watchAll --verbose --detectOpenHandles"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^5.1.0",
+    "config": "^3.3.9",
+    "express": "^4.18.2",
+    "express-async-errors": "^3.1.1",
+    "joi": "^17.9.2",
+    "joi-objectid": "^4.0.2",
+    "jsonwebtoken": "^9.0.1",
+    "lodash": "^4.17.21",
+    "moment": "^2.29.4",
+    "mongoose": "^7.4.2",
+    "pg": "^8.11.2",
+    "winston": "^3.10.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.46.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-import": "^2.28.0",
+    "eslint-plugin-prettier": "^5.0.0",
+    "jest": "^29.6.2",
+    "prettier": "^3.0.1",
+    "supertest": "^6.3.3"
+  },
+  "prettier": {
+    "singleQuote": true
+  }
+}

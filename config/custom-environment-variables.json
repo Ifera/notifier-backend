@@ -1,0 +1,4 @@
+{
+  "jwt_private_key": "NOTIFIER_JWT_PRIVATE_KEY",
+  "db_type": "NOTIFIER_DB_TYPE"
+}
