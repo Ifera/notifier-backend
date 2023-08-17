@@ -18,7 +18,7 @@ async function createEvent(req) {
 }
 
 async function getEventByID(id) {
-  return Event.findById(id);
+  return Event.findById(id, { is_deleted: false });
 }
 
 /**
