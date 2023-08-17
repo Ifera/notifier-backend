@@ -26,10 +26,10 @@ const filteredProps = [
 ];
 
 router.get('/', validateQueryParams(validateQP), async (req, res) => {
-  const events = await getEvents(req.query);
-  const filtered = _.map(events, _.partialRight(_.pick, filteredProps));
+  const result = await getEvents(req.query);
+  result.events = _.map(result.events, _.partialRight(_.pick, filteredProps));
 
-  res.send(filtered);
+  res.send(result);
 });
 
 router.get('/:id', validateObjectId, async (req, res) => {
@@ -55,7 +55,7 @@ router.delete('/:id', validateObjectId, async (req, res) => {
   return res.send('Success');
 });
 
-router.put(
+router.patch(
   '/:id',
   [validateObjectId, validateReq(validate)],
   async (req, res) => {

@@ -4,9 +4,9 @@ async function createEvent(req) {
   if (!req.application)
     throw new Error('"application" (application ID) is required');
 
-  const app = new Event(req);
+  const event = new Event(req);
 
-  return app.save();
+  return event.save();
 }
 
 async function getEventByID(id) {
@@ -55,7 +55,13 @@ async function getEvents({
   if (!application)
     throw new Error('"application" (application ID) is required');
 
-  const sortDirection = Number(sortOrder) === -1 ? 'desc' : 'asc';
+  /* eslint-disable no-param-reassign */
+  pageNumber = Number(pageNumber);
+  pageSize = Number(pageSize);
+  sortOrder = Number(sortOrder);
+  /* eslint-enable no-param-reassign */
+
+  const sortDirection = sortOrder === -1 ? 'desc' : 'asc';
   const nameRegex = new RegExp(like, 'i'); // 'i' -> case-insensitive
   const findQuery = {
     application,
@@ -65,15 +71,33 @@ async function getEvents({
 
   if (like) findQuery.name = nameRegex;
 
+  const totalEvents = await Event.countDocuments(findQuery);
   const query = Event.find(findQuery).sort({ [sortBy]: sortDirection });
 
-  if (pageNumber <= 0) return query;
+  if (pageNumber <= 0) {
+    return {
+      current_page: 1,
+      last_page: 1,
+      total_events: totalEvents,
+      events: await query,
+    };
+  }
 
   // if pageSize is less than 1, set it to 1
-  const pageLimit = pageSize < 1 ? 1 : pageSize;
-  const skipCount = (pageNumber - 1) * pageLimit;
+  const ps = pageSize < 1 ? 1 : pageSize;
+  const lastPage = Math.ceil(totalEvents / ps);
 
-  return query.skip(skipCount).limit(pageLimit);
+  // if pageNumber is greater than lastPage, set it to lastPage
+  pageNumber = pageNumber > lastPage ? lastPage : pageNumber; // eslint-disable-line
+
+  const skipCount = (pageNumber - 1) * ps;
+
+  return {
+    current_page: pageNumber,
+    last_page: lastPage,
+    total_events: totalEvents,
+    events: await query.skip(skipCount).limit(ps),
+  };
 }
 
 async function updateEvent(id, obj) {
@@ -87,8 +111,7 @@ async function updateEvent(id, obj) {
 }
 
 async function deleteEvent(id) {
-  const del = await Event.deleteOne({ _id: id });
-  return del.deletedCount > 0;
+  return updateEvent(id, { is_active: false, is_deleted: true });
 }
 
 module.exports = {

@@ -46,7 +46,13 @@ async function getApps({
   pageSize = 3,
   isActive = true,
 }) {
-  const sortDirection = Number(sortOrder) === -1 ? 'desc' : 'asc';
+  /* eslint-disable no-param-reassign */
+  pageNumber = Number(pageNumber);
+  pageSize = Number(pageSize);
+  sortOrder = Number(sortOrder);
+  /* eslint-enable no-param-reassign */
+
+  const sortDirection = sortOrder === -1 ? 'desc' : 'asc';
   const nameRegex = new RegExp(like, 'i'); // 'i' -> case-insensitive
   const findQuery = {
     is_active: isActive,
@@ -55,15 +61,33 @@ async function getApps({
 
   if (like) findQuery.name = nameRegex;
 
+  const totalApps = await Application.countDocuments(findQuery);
   const query = Application.find(findQuery).sort({ [sortBy]: sortDirection });
 
-  if (pageNumber <= 0) return query;
+  if (pageNumber <= 0) {
+    return {
+      current_page: 1,
+      last_page: 1,
+      total_apps: totalApps,
+      apps: await query,
+    };
+  }
 
   // if pageSize is less than 1, set it to 1
-  const pageLimit = pageSize < 1 ? 1 : pageSize;
-  const skipCount = (pageNumber - 1) * pageLimit;
+  const ps = pageSize < 1 ? 1 : pageSize;
+  const lastPage = Math.ceil(totalApps / ps);
 
-  return query.skip(skipCount).limit(pageLimit);
+  // if pageNumber is greater than lastPage, set it to lastPage
+  pageNumber = pageNumber > lastPage ? lastPage : pageNumber; // eslint-disable-line
+
+  const skipCount = (pageNumber - 1) * ps;
+
+  return {
+    current_page: pageNumber,
+    last_page: lastPage,
+    total_apps: totalApps,
+    apps: await query.skip(skipCount).limit(ps),
+  };
 }
 
 async function updateApp(id, obj) {
@@ -77,8 +101,7 @@ async function updateApp(id, obj) {
 }
 
 async function deleteApp(id) {
-  const del = await Application.deleteOne({ _id: id });
-  return del.deletedCount > 0;
+  return updateApp(id, { is_active: false, is_deleted: true });
 }
 
 module.exports = {

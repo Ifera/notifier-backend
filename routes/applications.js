@@ -25,10 +25,10 @@ const filteredProps = [
 ];
 
 router.get('/', validateQueryParams(validateQP), async (req, res) => {
-  const apps = await getApps(req.query);
-  const filtered = _.map(apps, _.partialRight(_.pick, filteredProps));
+  const result = await getApps(req.query);
+  result.apps = _.map(result.apps, _.partialRight(_.pick, filteredProps));
 
-  res.send(filtered);
+  res.send(result);
 });
 
 router.get('/:id', validateObjectId, async (req, res) => {
@@ -54,7 +54,7 @@ router.delete('/:id', validateObjectId, async (req, res) => {
   return res.send('Success');
 });
 
-router.put(
+router.patch(
   '/:id',
   [validateObjectId, validateReq(validate)],
   async (req, res) => {
