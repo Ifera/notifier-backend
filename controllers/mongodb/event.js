@@ -1,8 +1,16 @@
 const { Event } = require('../../models/event');
+const { getAppByID } = require('./application');
+const { ValidationError } = require('../../utils/error');
 
 async function createEvent(req) {
   if (!req.application)
-    throw new Error('"application" (application ID) is required');
+    throw new ValidationError('"application" (application ID) is required');
+
+  const app = await getAppByID(req.application);
+  if (!app)
+    throw new ValidationError(
+      'The application with the given ID was not found.',
+    );
 
   const event = new Event(req);
 
@@ -30,11 +38,11 @@ async function getEventByID(id) {
  * const options = {
  *   application: 'app id', // Application ID
  *   like: 'example',       // Search for events with names similar to 'example'
- *   sortBy: 'name',        // Sort applications by name
+ *   sortBy: 'name',        // Sort events by name
  *   sortOrder: -1,         // Sort in descending order
  *   pageNumber: 2,         // Retrieve the second page of results
- *   pageSize: 10           // Display 10 applications per page
- *   isActive: true         // Get only active applications
+ *   pageSize: 10           // Display 10 events per page
+ *   isActive: true         // Get only active events
  * };
  * try {
  *   const events = await getEvents(options);

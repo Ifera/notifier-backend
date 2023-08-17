@@ -41,9 +41,13 @@ router.get('/:id', validateObjectId, async (req, res) => {
   return res.send(_.pick(event, filteredProps));
 });
 
-router.post('/', validateReq(validatePost), async (req, res) => {
-  const event = await createEvent(req.body);
-  res.send(_.pick(event, filteredProps));
+router.post('/', validateReq(validatePost), async (req, res, next) => {
+  try {
+    const event = await createEvent(req.body);
+    return res.send(_.pick(event, filteredProps));
+  } catch (err) {
+    return next(err);
+  }
 });
 
 router.delete('/:id', validateObjectId, async (req, res) => {
