@@ -7,7 +7,7 @@ async function createApp(req) {
 }
 
 async function getAppByID(id) {
-  return Application.findById(id, { is_deleted: false });
+  return Application.findOne({ _id: id, is_deleted: false });
 }
 
 /**
