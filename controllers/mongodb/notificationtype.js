@@ -133,63 +133,17 @@ async function deleteNotificationType(id) {
   return updateNotificationType(id, { is_active: false, is_deleted: true });
 }
 
+async function isNotificationTypeActive(id) {
+  const res = await getNotificationTypeByID(id);
+
+  return !res ? false : res.is_active && !res.is_deleted;
+}
+
 module.exports = {
   createNotificationType,
   getNotificationTypeByID,
   getNotificationTypes,
   updateNotificationType,
   deleteNotificationType,
+  isNotificationTypeActive,
 };
-
-// ------------------------------------------------------------
-
-// async function run() {
-//   // eslint-disable-next-line global-require
-//   const mongoose = require('mongoose');
-
-//   // connect to mongodb
-//   mongoose
-//     .connect('mongodb://localhost:27017/notifier_dev')
-//     .then(() => console.log('Connected to MongoDB...'))
-//     .catch((err) => console.error(err.message));
-
-//   console.log('run');
-
-//   const id = '3';
-//   const res = await createNotificationType({
-//     name: `notif${id}`,
-//     description: `notif ${id}`,
-//     template_subject: `notif subject ${id}`,
-//     template_body: `notif body ${id}`,
-//     tags: ['tag1', 'tag2'],
-//     event: '64db37c263c48bbb1f2b9ced',
-//   }); // 64dccb02885c7513c607d0eb
-
-//   console.log(res);
-
-//   // const d = await Event.find().populate('application');
-
-//   // console.log(d);
-
-//   // await createApp('egs', 'egs app');
-//   // await createApp('ets ap 2', 'egs app 2');
-
-//   // console.log(await getApps());
-
-//   // const tempApp = {
-//   //   name: 'app3',
-//   //   description: 'another 1 updated',
-//   //   is_active: false,
-//   //   is_deleted: false,
-//   // };
-
-//   // await updateApp('', tempApp);
-//   // await deleteApp('');
-
-//   // console.log(await getAppByName('app2'));
-//   // console.log(await getApps({ pageNumber: 0 }));
-// }
-
-// run();
-
-// ------------------------------------------------------------

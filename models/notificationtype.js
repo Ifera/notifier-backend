@@ -83,6 +83,7 @@ function validatePost(req) {
   return _schema.validate(req);
 }
 
+// used for patch/put req
 function validate(req) {
   return schema.validate(req);
 }

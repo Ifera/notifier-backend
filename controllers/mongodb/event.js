@@ -122,10 +122,17 @@ async function deleteEvent(id) {
   return updateEvent(id, { is_active: false, is_deleted: true });
 }
 
+async function isEventActive(id) {
+  const res = await getEventByID(id);
+
+  return !res ? false : res.is_active && !res.is_deleted;
+}
+
 module.exports = {
   createEvent,
   getEventByID,
   getEvents,
   updateEvent,
   deleteEvent,
+  isEventActive,
 };

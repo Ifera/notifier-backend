@@ -104,10 +104,17 @@ async function deleteApp(id) {
   return updateApp(id, { is_active: false, is_deleted: true });
 }
 
+async function isAppActive(id) {
+  const res = await getAppByID(id);
+
+  return !res ? false : res.is_active && !res.is_deleted;
+}
+
 module.exports = {
   createApp,
   getAppByID,
   getApps,
   updateApp,
   deleteApp,
+  isAppActive,
 };

@@ -8,6 +8,7 @@ const error = require('../middleware/error');
 const apps = require('../routes/applications');
 const events = require('../routes/events');
 const notificationTypes = require('../routes/notificationtypes');
+const messages = require('../routes/messages');
 
 function addRoute(app, route, module) {
   app.use(route, module);
@@ -24,6 +25,7 @@ module.exports = function (app) {
   addRoute(app, '/api/apps', apps);
   addRoute(app, '/api/events', events);
   addRoute(app, '/api/notification-types', notificationTypes);
+  addRoute(app, '/api/message', messages);
 
   app.use(error);
 };
