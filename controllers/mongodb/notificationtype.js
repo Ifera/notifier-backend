@@ -133,6 +133,13 @@ async function deleteNotificationType(id) {
   return updateNotificationType(id, { is_active: false, is_deleted: true });
 }
 
+async function deleteNotificationTypesByEventID(id) {
+  return NotificationType.updateMany(
+    { event: id },
+    { is_active: false, is_deleted: true },
+  );
+}
+
 async function isNotificationTypeActive(id) {
   const res = await getNotificationTypeByID(id);
 

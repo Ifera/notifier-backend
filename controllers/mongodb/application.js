@@ -1,4 +1,7 @@
+const Fawn = require('fawn');
 const { Application } = require('../../models/application');
+const { Event } = require('../../models/event');
+const { NotificationType } = require('../../models/notificationtype');
 
 async function createApp(req) {
   const app = new Application(req);
@@ -101,7 +104,25 @@ async function updateApp(id, obj) {
 }
 
 async function deleteApp(id) {
-  return updateApp(id, { is_active: false, is_deleted: true });
+  const app = await updateApp(id, { is_active: false, is_deleted: true });
+  if (!app) return false;
+
+  // delete all events associated with this app
+  await Event.updateMany(
+    { application: id },
+    { $set: { is_active: false, is_deleted: true } },
+  );
+
+  // get the list of Event IDs associated with this app
+  const eventIds = await Event.find({ application: id }).distinct('_id');
+
+  // update related NotificationTypes
+  await NotificationType.updateMany(
+    { event: { $in: eventIds } },
+    { $set: { is_active: false, is_deleted: true } },
+  );
+
+  return app;
 }
 
 async function isAppActive(id) {

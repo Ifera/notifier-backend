@@ -1,4 +1,5 @@
 const { Event } = require('../../models/event');
+const { NotificationType } = require('../../models/notificationtype');
 const { getAppByID } = require('./application');
 const { ValidationError } = require('../../utils/error');
 
@@ -119,7 +120,22 @@ async function updateEvent(id, obj) {
 }
 
 async function deleteEvent(id) {
-  return updateEvent(id, { is_active: false, is_deleted: true });
+  const event = updateEvent(id, { is_active: false, is_deleted: true });
+  if (!event) return false;
+
+  await NotificationType.updateMany(
+    { event: id },
+    { $set: { is_active: false, is_deleted: true } },
+  );
+
+  return event;
+}
+
+async function deleteEventsByAppID(id) {
+  return Event.updateMany(
+    { application: id },
+    { is_active: false, is_deleted: true },
+  );
 }
 
 async function isEventActive(id) {
