@@ -1,6 +1,5 @@
 const config = require('config');
 const winston = require('winston');
-// const db = require('./db');
 
 module.exports = function () {
   if (!config.get('port')) {
