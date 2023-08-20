@@ -1,4 +1,3 @@
-const Fawn = require('fawn');
 const { Application } = require('../../models/application');
 const { Event } = require('../../models/event');
 const { NotificationType } = require('../../models/notificationtype');

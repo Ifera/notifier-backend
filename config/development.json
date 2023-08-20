@@ -1,6 +1,13 @@
 {
-  "name": "dev",
-  "mongo_db": "mongodb://localhost:27017/notifier_dev",
-  "jwt_private_key": "abcd1234",
-  "db_type": "mongodb"
+  "port": 3000,
+
+  "db_type": "postgres",
+
+  "db_host": "localhost",
+  "db_port": "5432",
+  "db_user": "postgres",
+  "db_password": "gosaas",
+  "db_schema": "service_notifier",
+
+  "mongodb_uri": "mongodb://localhost:27017/notifier_dev"
 }

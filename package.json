@@ -21,10 +21,11 @@
     "joi": "^17.9.2",
     "joi-objectid": "^4.0.2",
     "jsonwebtoken": "^9.0.1",
+    "knex": "^2.5.1",
     "lodash": "^4.17.21",
     "moment": "^2.29.4",
-    "mongoose": "^7.4.2",
-    "pg": "^8.11.2",
+    "mongoose": "^7.4.3",
+    "pg": "^8.11.3",
     "winston": "^3.10.0"
   },
   "devDependencies": {

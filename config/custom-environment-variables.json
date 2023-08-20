@@ -1,4 +1,12 @@
 {
-  "jwt_private_key": "NOTIFIER_JWT_PRIVATE_KEY",
-  "db_type": "NOTIFIER_DB_TYPE"
+  "port": "NOTIFIER_PORT",
+
+  "db_type": "NOTIFIER_DB_TYPE",
+  "db_host": "NOTIFIER_DB_HOST",
+  "db_port": "NOTIFIER_DB_PORT",
+  "db_user": "NOTIFIER_DB_USER",
+  "db_password": "NOTIFIER_DB_PASSWORD",
+  "db_schema": "NOTIFIER_DB_SCHEMA",
+
+  "mongodb_uri": "NOTIFIER_MONGODB_URI"
 }

@@ -8,12 +8,24 @@ module.exports = function () {
   winston.debug('init db');
 
   if (USE_MONGO_DB) {
-    const db = config.get('mongo_db');
-    mongoose.connect(db).then(() => winston.info('Connected to MongoDB...'));
+    winston.info('Using MongoDB');
+
+    const uri = config.get('mongodb_uri');
+    mongoose.connect(uri).then(() => winston.info('Connected to MongoDB...'));
 
     return;
   }
 
-  // TODO: implement knex
-  winston.debug('TODO');
+  winston.debug('Using Knex (postgres)');
+
+  const conn = require('../knex/knex');
+
+  conn
+    .raw('SELECT 1+1 AS result')
+    .then(() => winston.info('Connected to Postgres...'))
+    .catch((err) => {
+      winston.error('Could not connect to Postgres...');
+      winston.error(err.message);
+      process.exit(1);
+    });
 };
