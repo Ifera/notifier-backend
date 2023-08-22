@@ -72,11 +72,9 @@ async function getNotificationTypes({
 }) {
   if (!event) throw new Error('"event" (event ID) is required');
 
-  /* eslint-disable no-param-reassign */
   pageNumber = Number(pageNumber);
   pageSize = Number(pageSize);
   sortOrder = Number(sortOrder);
-  /* eslint-enable no-param-reassign */
 
   const sortDirection = sortOrder === -1 ? 'desc' : 'asc';
   const nameRegex = new RegExp(like, 'i'); // 'i' -> case-insensitive
@@ -152,5 +150,6 @@ module.exports = {
   getNotificationTypes,
   updateNotificationType,
   deleteNotificationType,
+  deleteNotificationTypesByEventID,
   isNotificationTypeActive,
 };

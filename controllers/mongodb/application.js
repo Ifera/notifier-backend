@@ -48,11 +48,9 @@ async function getApps({
   pageSize = 3,
   isActive = true,
 }) {
-  /* eslint-disable no-param-reassign */
   pageNumber = Number(pageNumber);
   pageSize = Number(pageSize);
   sortOrder = Number(sortOrder);
-  /* eslint-enable no-param-reassign */
 
   const sortDirection = sortOrder === -1 ? 'desc' : 'asc';
   const nameRegex = new RegExp(like, 'i'); // 'i' -> case-insensitive

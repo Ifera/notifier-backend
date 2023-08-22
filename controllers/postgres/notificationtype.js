@@ -1,16 +1,36 @@
 const knex = require('../../knex/knex');
 
-async function createApp(req) {
-  const ret = await knex('applications').insert(req).returning('*');
+async function createNotificationType(req) {
+  const _req = { ...req };
+  if (_req.tags) _req.tags = _req.tags.join(';');
+
+  const ret = await knex('notificationtypes').insert(_req).returning('*');
+
+  if (req.tags) {
+    const tags = req.tags.map((tag) => ({
+      label: tag,
+    }));
+
+    await knex('tags').insert(tags).onConflict('label').ignore();
+  }
+
   return !ret ? null : ret[0];
 }
 
-async function getAppByID(id) {
-  return knex('applications')
+async function getNotificationTypeByID(id) {
+  const notif = await knex('notificationtypes')
     .select('*')
     .where({ id })
     .andWhere('is_deleted', false)
     .first();
+
+  if (!notif) return null;
+
+  if (notif.tags) {
+    notif.tags = notif.tags.split(';');
+  }
+
+  return notif;
 }
 
 /**
@@ -41,7 +61,7 @@ async function getAppByID(id) {
  *   console.error("Error:", error);
  * }
  */
-async function getApps({
+async function getNotificationTypes({
   like = '',
   sortBy = 'name',
   sortOrder = 1,
@@ -53,21 +73,21 @@ async function getApps({
   pageSize = Number(pageSize);
   sortOrder = Number(sortOrder);
 
-  const totalAppsQuery = knex('applications')
-    .count('id as totalApps')
+  const totalNotifQuery = knex('notificationtypes')
+    .count('id as totalNotifs')
     .where('is_deleted', false)
     .andWhere('is_active', isActive)
     .first();
 
   // Filter by name using regex (matches anywhere in the name)
   if (like) {
-    totalAppsQuery.andWhere('name', '~*', `.*${like}.*`); // Case-insensitive regex search
+    totalNotifQuery.andWhere('name', '~*', `.*${like}.*`); // Case-insensitive regex search
   }
 
-  const { totalApps } = await totalAppsQuery;
+  const { totalNotifs } = await totalNotifQuery;
   const sortDirection = sortOrder === -1 ? 'desc' : 'asc';
 
-  const query = knex('applications')
+  const query = knex('notificationtypes')
     .select('*')
     .where('is_deleted', false)
     .andWhere('is_active', isActive)
@@ -75,37 +95,47 @@ async function getApps({
     .returning('*');
 
   if (like) {
-    query.andWhere('name', '~*', `.*${like}.*`); // Case-insensitive regex search
+    query.andWhere('name', '~*', `.*${like}.*`);
   }
+
+  let notifs = await query;
+  notifs.forEach((notif) => {
+    if (notif.tags) notif.tags = notif.tags.split(';');
+  });
 
   if (pageNumber <= 0) {
     return {
       current_page: 1,
       last_page: 1,
-      total_apps: totalApps,
-      apps: await query,
+      total_notification_types: totalNotifs,
+      notification_types: notifs,
     };
   }
 
   // if pageSize is less than 1, set it to 1
   const ps = pageSize < 1 ? 1 : pageSize;
-  const lastPage = Math.ceil(totalApps / ps);
+  const lastPage = Math.ceil(totalNotifs / ps);
 
   // if pageNumber is greater than lastPage, set it to lastPage
   pageNumber = pageNumber > lastPage ? lastPage : pageNumber; // eslint-disable-line
 
   const skipCount = (pageNumber - 1) * ps;
 
+  notifs = await query.limit(ps).offset(skipCount);
+  notifs.forEach((notif) => {
+    if (notif.tags) notif.tags = notif.tags.split(';');
+  });
+
   return {
     current_page: pageNumber,
     last_page: lastPage,
-    total_apps: totalApps,
-    apps: await query.limit(ps).offset(skipCount),
+    total_notification_types: totalNotifs,
+    notification_types: notifs,
   };
 }
 
-async function updateApp(id, req) {
-  const ret = await knex('applications')
+async function updateNotificationType(id, req) {
+  const ret = await knex('notificationtypes')
     .update(req)
     .where({ id })
     .returning('*');
@@ -113,15 +143,19 @@ async function updateApp(id, req) {
   return !ret ? null : ret[0];
 }
 
-async function deleteApp(id) {
-  const ret = await knex('applications').delete().where({ id }).returning('*');
+async function deleteNotificationType(id) {
+  const ret = await knex('notificationtypes')
+    .delete()
+    .where({ id })
+    .returning('*');
+
   return !ret ? null : ret[0];
 }
 
 module.exports = {
-  createApp,
-  getAppByID,
-  getApps,
-  updateApp,
-  deleteApp,
+  createNotificationType,
+  getNotificationTypeByID,
+  getNotificationTypes,
+  updateNotificationType,
+  deleteNotificationType,
 };

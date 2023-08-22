@@ -1,12 +1,12 @@
 const knex = require('../../knex/knex');
 
-async function createApp(req) {
-  const ret = await knex('applications').insert(req).returning('*');
+async function createEvent(req) {
+  const ret = await knex('events').insert(req).returning('*');
   return !ret ? null : ret[0];
 }
 
-async function getAppByID(id) {
-  return knex('applications')
+async function getEventByID(id) {
+  return knex('events')
     .select('*')
     .where({ id })
     .andWhere('is_deleted', false)
@@ -41,7 +41,7 @@ async function getAppByID(id) {
  *   console.error("Error:", error);
  * }
  */
-async function getApps({
+async function getEvents({
   like = '',
   sortBy = 'name',
   sortOrder = 1,
@@ -53,21 +53,21 @@ async function getApps({
   pageSize = Number(pageSize);
   sortOrder = Number(sortOrder);
 
-  const totalAppsQuery = knex('applications')
-    .count('id as totalApps')
+  const totalEventsQuery = knex('events')
+    .count('id as totalEvents')
     .where('is_deleted', false)
     .andWhere('is_active', isActive)
     .first();
 
   // Filter by name using regex (matches anywhere in the name)
   if (like) {
-    totalAppsQuery.andWhere('name', '~*', `.*${like}.*`); // Case-insensitive regex search
+    totalEventsQuery.andWhere('name', '~*', `.*${like}.*`); // Case-insensitive regex search
   }
 
-  const { totalApps } = await totalAppsQuery;
+  const { totalEvents } = await totalEventsQuery;
   const sortDirection = sortOrder === -1 ? 'desc' : 'asc';
 
-  const query = knex('applications')
+  const query = knex('events')
     .select('*')
     .where('is_deleted', false)
     .andWhere('is_active', isActive)
@@ -82,14 +82,14 @@ async function getApps({
     return {
       current_page: 1,
       last_page: 1,
-      total_apps: totalApps,
-      apps: await query,
+      total_events: totalEvents,
+      events: await query,
     };
   }
 
   // if pageSize is less than 1, set it to 1
   const ps = pageSize < 1 ? 1 : pageSize;
-  const lastPage = Math.ceil(totalApps / ps);
+  const lastPage = Math.ceil(totalEvents / ps);
 
   // if pageNumber is greater than lastPage, set it to lastPage
   pageNumber = pageNumber > lastPage ? lastPage : pageNumber; // eslint-disable-line
@@ -99,29 +99,25 @@ async function getApps({
   return {
     current_page: pageNumber,
     last_page: lastPage,
-    total_apps: totalApps,
-    apps: await query.limit(ps).offset(skipCount),
+    total_events: totalEvents,
+    events: await query.limit(ps).offset(skipCount),
   };
 }
 
-async function updateApp(id, req) {
-  const ret = await knex('applications')
-    .update(req)
-    .where({ id })
-    .returning('*');
-
+async function updateEvent(id, req) {
+  const ret = await knex('events').update(req).where({ id }).returning('*');
   return !ret ? null : ret[0];
 }
 
-async function deleteApp(id) {
-  const ret = await knex('applications').delete().where({ id }).returning('*');
+async function deleteEvent(id) {
+  const ret = await knex('events').delete().where({ id }).returning('*');
   return !ret ? null : ret[0];
 }
 
 module.exports = {
-  createApp,
-  getAppByID,
-  getApps,
-  updateApp,
-  deleteApp,
+  createEvent,
+  getEventByID,
+  getEvents,
+  updateEvent,
+  deleteEvent,
 };

@@ -64,11 +64,9 @@ async function getEvents({
   if (!application)
     throw new Error('"application" (application ID) is required');
 
-  /* eslint-disable no-param-reassign */
   pageNumber = Number(pageNumber);
   pageSize = Number(pageSize);
   sortOrder = Number(sortOrder);
-  /* eslint-enable no-param-reassign */
 
   const sortDirection = sortOrder === -1 ? 'desc' : 'asc';
   const nameRegex = new RegExp(like, 'i'); // 'i' -> case-insensitive

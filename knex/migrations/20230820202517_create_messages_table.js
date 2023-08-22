@@ -8,18 +8,17 @@ exports.up = function (knex) {
       t.increments('id').unsigned().primary();
       t.string('subject', 255).notNullable();
       t.text('body').notNullable();
-      t.text('recipient').notNullable();
+      t.text('email').notNullable();
       t.boolean('is_pending').notNullable().defaultTo(true);
       t.dateTime('created_at').defaultTo(knex.raw('CURRENT_TIMESTAMP'));
       t.dateTime('updated_at').defaultTo(knex.raw('CURRENT_TIMESTAMP'));
 
-      t.integer('notification').notNullable();
-      t.foreign('notification')
+      t.integer('notification_type').notNullable();
+      t.foreign('notification_type')
         .references('id')
-        .inTable('notificationtypes')
-        .onDelete('CASCADE');
+        .inTable('notificationtypes');
 
-      t.index('notification');
+      t.index('notification_type');
     })
     .then(() =>
       knex.raw(`
@@ -38,7 +37,7 @@ exports.up = function (knex) {
 exports.down = function (knex) {
   return knex.schema
     .alterTable('messages', (table) => {
-      table.dropForeign('notification');
+      table.dropForeign('notification_type');
     })
     .dropTable('messages');
 };

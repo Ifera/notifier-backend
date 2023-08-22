@@ -10,7 +10,7 @@ exports.up = function (knex) {
       t.string('description', 255).notNullable().defaultTo('');
       t.string('template_subject', 255).notNullable();
       t.text('template_body').notNullable();
-      t.text('tags').notNullable();
+      t.text('tags').notNullable().defaultTo('');
       t.boolean('is_active').notNullable().defaultTo(false);
       t.boolean('is_deleted').notNullable().defaultTo(false);
       t.dateTime('created_at').defaultTo(knex.raw('CURRENT_TIMESTAMP'));
