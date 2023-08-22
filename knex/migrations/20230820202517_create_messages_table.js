@@ -11,7 +11,7 @@ exports.up = function (knex) {
       t.text('email').notNullable();
       t.boolean('is_pending').notNullable().defaultTo(true);
       t.dateTime('created_at').defaultTo(knex.raw('CURRENT_TIMESTAMP'));
-      t.dateTime('updated_at').defaultTo(knex.raw('CURRENT_TIMESTAMP'));
+      t.dateTime('modified_at').defaultTo(knex.raw('CURRENT_TIMESTAMP'));
 
       t.integer('notification_type').notNullable();
       t.foreign('notification_type')
@@ -22,10 +22,10 @@ exports.up = function (knex) {
     })
     .then(() =>
       knex.raw(`
-      CREATE TRIGGER update_messages_updated_at
+      CREATE TRIGGER update_messages_modified_at
       BEFORE UPDATE ON messages
       FOR EACH ROW
-      EXECUTE PROCEDURE update_updated_at();
+      EXECUTE PROCEDURE update_modified_at();
       `),
     );
 };

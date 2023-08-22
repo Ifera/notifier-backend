@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const Joi = require('joi');
 const { qpSchema } = require('../utils/params');
+const { USE_MONGO_DB } = require('../globals');
 
 const ntSchema = new mongoose.Schema({
   name: {
@@ -8,6 +9,7 @@ const ntSchema = new mongoose.Schema({
     required: true,
     minlength: 3,
     maxlength: 50,
+    unique: true,
   },
   description: {
     type: String,
@@ -53,9 +55,16 @@ const ntSchema = new mongoose.Schema({
 
 const NotificationType = mongoose.model('NotificationType', ntSchema);
 
+// the keys that will remain same for query, post and put
+const data = (required) => ({
+  event: USE_MONGO_DB
+    ? Joi.objectId().required(required)
+    : Joi.number().integer().positive().required(required),
+});
+
 function validateQP(req) {
   const _schema = qpSchema.keys({
-    event: Joi.objectId().required(),
+    ...data(true),
   });
 
   return _schema.validate(req);
@@ -69,7 +78,7 @@ const schema = Joi.object({
   tags: Joi.array().items(Joi.string().min(3)),
   is_active: Joi.boolean(),
   is_deleted: Joi.boolean(),
-  event: Joi.objectId(),
+  ...data(false),
 });
 
 function validatePost(req) {
@@ -77,7 +86,7 @@ function validatePost(req) {
     name: Joi.string().min(3).max(50).required(),
     template_subject: Joi.string().min(5).required(),
     template_body: Joi.string().min(5).required(),
-    event: Joi.objectId().required(),
+    ...data(true),
   });
 
   return _schema.validate(req);

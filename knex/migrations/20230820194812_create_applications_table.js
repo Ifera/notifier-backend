@@ -11,14 +11,14 @@ exports.up = function (knex) {
       t.boolean('is_active').notNullable().defaultTo(false);
       t.boolean('is_deleted').notNullable().defaultTo(false);
       t.dateTime('created_at').defaultTo(knex.raw('CURRENT_TIMESTAMP'));
-      t.dateTime('updated_at').defaultTo(knex.raw('CURRENT_TIMESTAMP'));
+      t.dateTime('modified_at').defaultTo(knex.raw('CURRENT_TIMESTAMP'));
     })
     .then(() =>
       knex.raw(`
-      CREATE TRIGGER update_applications_updated_at
+      CREATE TRIGGER update_applications_modified_at
       BEFORE UPDATE ON applications
       FOR EACH ROW
-      EXECUTE PROCEDURE update_updated_at();
+      EXECUTE PROCEDURE update_modified_at();
       `),
     );
 };

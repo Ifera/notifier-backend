@@ -14,7 +14,7 @@ exports.up = function (knex) {
       t.boolean('is_active').notNullable().defaultTo(false);
       t.boolean('is_deleted').notNullable().defaultTo(false);
       t.dateTime('created_at').defaultTo(knex.raw('CURRENT_TIMESTAMP'));
-      t.dateTime('updated_at').defaultTo(knex.raw('CURRENT_TIMESTAMP'));
+      t.dateTime('modified_at').defaultTo(knex.raw('CURRENT_TIMESTAMP'));
 
       t.integer('event').notNullable();
       t.foreign('event').references('id').inTable('events').onDelete('CASCADE');
@@ -24,10 +24,10 @@ exports.up = function (knex) {
     })
     .then(() =>
       knex.raw(`
-      CREATE TRIGGER update_notificationtypes_updated_at
+      CREATE TRIGGER update_notificationtypes_modified_at
       BEFORE UPDATE ON notificationtypes
       FOR EACH ROW
-      EXECUTE PROCEDURE update_updated_at();
+      EXECUTE PROCEDURE update_modified_at();
       `),
     );
 };

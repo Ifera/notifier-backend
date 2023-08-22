@@ -6,6 +6,7 @@ const router = express.Router();
 const { validateReq, validateQueryParams } = require('../middleware/validate');
 const validateObjectId = require('../middleware/validateObjectId');
 const { validateQP, validatePost, validate } = require('../models/event');
+const { DB_TYPE } = require('../globals');
 
 const {
   createEvent,
@@ -13,7 +14,7 @@ const {
   getEvents,
   updateEvent,
   deleteEvent,
-} = require('../controllers/mongodb/event');
+} = require(`../controllers/${DB_TYPE}/event`); // eslint-disable-line
 
 const filteredProps = [
   'id',

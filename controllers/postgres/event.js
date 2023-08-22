@@ -14,34 +14,37 @@ async function getEventByID(id) {
 }
 
 /**
- * Retrieves a paginated list of applications based on the specified parameters.
+ * Retrieves a paginated list of events of an application based on the specified parameters.
  *
  * @param {Object} options - Options for querying applications.
- * @param {string} [options.like=''] - Search for applications with names similar to the specified string.
- * @param {string} [options.sortBy='name'] - The field by which to sort the applications.
+ * @param {string} [options.application] - The application ID [Required].
+ * @param {string} [options.like=''] - Search for event with names similar to the specified string.
+ * @param {string} [options.sortBy='name'] - The field by which to sort the result. ['name','created_at','modified_at','is_active'].
  * @param {number} [options.sortOrder=1] - The sort order: 1 for ascending, -1 for descending.
  * @param {number} [options.pageNumber=1] - The current page number for pagination. If 0, returns all results.
- * @param {number} [options.pageSize=3] - The number of applications to retrieve per page.
- * @param {boolean} [options.isActive=true] - Retrieve applications based on is_active flag.
- * @returns {Promise<Array>} A promise that resolves with an array of application documents.
+ * @param {number} [options.pageSize=3] - The number of results to retrieve per page.
+ * @param {boolean} [options.isActive=true] - Retrieve result based on is_active flag.
+ * @returns {Promise<Array>} A promise that resolves with an array of resultant documents.
  *
  * @example
  * const options = {
- *   like: 'example',       // Search for apps with names similar to 'example'
- *   sortBy: 'name',        // Sort applications by name
+ *   application: 'app id', // Application ID
+ *   like: 'example',       // Search for events with names similar to 'example'
+ *   sortBy: 'name',        // Sort events by name
  *   sortOrder: -1,         // Sort in descending order
  *   pageNumber: 2,         // Retrieve the second page of results
- *   pageSize: 10           // Display 10 applications per page
- *   isActive: true         // Get only active applications
+ *   pageSize: 10           // Display 10 events per page
+ *   isActive: true         // Get only active events
  * };
  * try {
- *   const applications = await getApps(options);
- *   console.log(applications); // Array of application documents
+ *   const events = await getEvents(options);
+ *   console.log(events); // Array of event documents
  * } catch (error) {
  *   console.error("Error:", error);
  * }
  */
 async function getEvents({
+  application,
   like = '',
   sortBy = 'name',
   sortOrder = 1,
@@ -57,6 +60,7 @@ async function getEvents({
     .count('id as totalEvents')
     .where('is_deleted', false)
     .andWhere('is_active', isActive)
+    .andWhere('application', application)
     .first();
 
   // Filter by name using regex (matches anywhere in the name)
@@ -64,13 +68,15 @@ async function getEvents({
     totalEventsQuery.andWhere('name', '~*', `.*${like}.*`); // Case-insensitive regex search
   }
 
-  const { totalEvents } = await totalEventsQuery;
+  const res = await totalEventsQuery;
+  const totalEvents = Number(res.totalEvents);
   const sortDirection = sortOrder === -1 ? 'desc' : 'asc';
 
   const query = knex('events')
     .select('*')
     .where('is_deleted', false)
     .andWhere('is_active', isActive)
+    .andWhere('application', application)
     .orderBy(sortBy, sortDirection)
     .returning('*');
 

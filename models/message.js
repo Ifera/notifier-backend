@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Joi = require('joi');
+const { USE_MONGO_DB } = require('../globals');
 
 const messageSchema = new mongoose.Schema({
   subject: {
@@ -39,9 +40,11 @@ const Message = mongoose.model('Message', messageSchema);
 
 function validatePost(req) {
   const schema = Joi.object({
-    notification_type: Joi.objectId().required(),
     email: Joi.string().email().required(),
     metadata: Joi.object().required(),
+    notification_type: USE_MONGO_DB
+      ? Joi.objectId().required()
+      : Joi.number().integer().positive().required(),
   });
 
   return schema.validate(req);

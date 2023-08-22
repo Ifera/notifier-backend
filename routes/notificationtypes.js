@@ -5,6 +5,8 @@ const router = express.Router();
 
 const { validateReq, validateQueryParams } = require('../middleware/validate');
 const validateObjectId = require('../middleware/validateObjectId');
+const { DB_TYPE } = require('../globals');
+
 const {
   validateQP,
   validatePost,
@@ -17,7 +19,7 @@ const {
   getNotificationTypes,
   updateNotificationType,
   deleteNotificationType,
-} = require('../controllers/mongodb/notificationtype');
+} = require(`../controllers/${DB_TYPE}/notificationtype`); // eslint-disable-line
 
 const filteredProps = [
   'id',

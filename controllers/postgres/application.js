@@ -64,7 +64,8 @@ async function getApps({
     totalAppsQuery.andWhere('name', '~*', `.*${like}.*`); // Case-insensitive regex search
   }
 
-  const { totalApps } = await totalAppsQuery;
+  const res = await totalAppsQuery;
+  const totalApps = Number(res.totalApps);
   const sortDirection = sortOrder === -1 ? 'desc' : 'asc';
 
   const query = knex('applications')
