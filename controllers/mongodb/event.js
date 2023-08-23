@@ -129,6 +129,22 @@ async function deleteEvent(id) {
   return event;
 }
 
+async function deleteEvents(ids) {
+  const events = await Event.updateMany(
+    { _id: { $in: ids } },
+    { is_active: false, is_deleted: true },
+  );
+
+  if (!events) return false;
+
+  await NotificationType.updateMany(
+    { event: { $in: ids } },
+    { $set: { is_active: false, is_deleted: true } },
+  );
+
+  return events;
+}
+
 async function deleteEventsByAppID(id) {
   return Event.updateMany(
     { application: id },
@@ -148,5 +164,7 @@ module.exports = {
   getEvents,
   updateEvent,
   deleteEvent,
+  deleteEvents,
+  deleteEventsByAppID,
   isEventActive,
 };

@@ -129,6 +129,13 @@ async function deleteNotificationType(id) {
   return updateNotificationType(id, { is_active: false, is_deleted: true });
 }
 
+async function deleteNotificationTypes(ids) {
+  return NotificationType.updateMany(
+    { _id: { $in: ids } },
+    { is_active: false, is_deleted: true },
+  );
+}
+
 async function deleteNotificationTypesByEventID(id) {
   return NotificationType.updateMany(
     { event: id },
@@ -148,6 +155,7 @@ module.exports = {
   getNotificationTypes,
   updateNotificationType,
   deleteNotificationType,
+  deleteNotificationTypes,
   deleteNotificationTypesByEventID,
   isNotificationTypeActive,
 };

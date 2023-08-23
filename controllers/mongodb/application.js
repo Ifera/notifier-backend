@@ -122,6 +122,34 @@ async function deleteApp(id) {
   return app;
 }
 
+async function deleteApps(ids) {
+  const apps = await Application.updateMany(
+    { _id: { $in: ids } },
+    { $set: { is_active: false, is_deleted: true } },
+  );
+
+  if (!apps) return false;
+
+  // delete all events associated with this app
+  await Event.updateMany(
+    { application: { $in: ids } },
+    { $set: { is_active: false, is_deleted: true } },
+  );
+
+  // get the list of Event IDs associated with this app
+  const eventIds = await Event.find({ application: { $in: ids } }).distinct(
+    '_id',
+  );
+
+  // update related NotificationTypes
+  await NotificationType.updateMany(
+    { event: { $in: eventIds } },
+    { $set: { is_active: false, is_deleted: true } },
+  );
+
+  return apps;
+}
+
 async function isAppActive(id) {
   const res = await getAppByID(id);
 
@@ -134,5 +162,6 @@ module.exports = {
   getApps,
   updateApp,
   deleteApp,
+  deleteApps,
   isAppActive,
 };
