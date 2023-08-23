@@ -20,7 +20,7 @@ exports.up = function (knex) {
       t.foreign('event').references('id').inTable('events').onDelete('CASCADE');
 
       t.index('event');
-      t.unique(['name']);
+      t.unique(['event', 'name']);
     })
     .then(() =>
       knex.raw(`

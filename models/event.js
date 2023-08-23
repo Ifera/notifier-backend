@@ -9,7 +9,6 @@ const eventSchema = new mongoose.Schema({
     required: true,
     minlength: 3,
     maxlength: 50,
-    unique: true,
   },
   description: {
     type: String,
@@ -38,6 +37,8 @@ const eventSchema = new mongoose.Schema({
     required: true,
   },
 });
+
+eventSchema.index({ name: 1, application: 1 }, { unique: true });
 
 const Event = mongoose.model('Event', eventSchema);
 

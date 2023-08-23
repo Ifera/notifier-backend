@@ -53,6 +53,8 @@ const ntSchema = new mongoose.Schema({
   },
 });
 
+ntSchema.index({ name: 1, event: 1 }, { unique: true });
+
 const NotificationType = mongoose.model('NotificationType', ntSchema);
 
 function validateQP(req) {
@@ -70,7 +72,6 @@ const schema = Joi.object({
   description: Joi.string().max(255),
   template_subject: Joi.string().min(5),
   template_body: Joi.string().min(5),
-  // tags: Joi.array().items(Joi.string().min(3)),
   is_active: Joi.boolean(),
   is_deleted: Joi.boolean(),
   event: USE_MONGO_DB ? Joi.objectId() : Joi.number().integer().positive(),
