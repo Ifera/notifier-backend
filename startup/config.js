@@ -10,34 +10,28 @@ module.exports = function () {
   //   throw new Error('FATAL ERROR: jwt_private_key is not defined.');
   // }
 
-  const dbType = config.get('db_type');
+  const dbType = config.get('db.type');
 
   if (!dbType) {
-    throw new Error('FATAL ERROR: db_type is not defined.');
+    throw new Error('FATAL ERROR: db.type is not defined.');
   }
 
   if (dbType !== 'mongodb' && dbType !== 'postgres') {
     throw new Error(
-      'FATAL ERROR: db_type should be one of "mongodb" or "postgres".',
+      'FATAL ERROR: db.type should be one of "mongodb" or "postgres".',
     );
   }
 
-  if (dbType === 'mongodb' && !config.get('mongodb_uri')) {
-    throw new Error('FATAL ERROR: mongodb_uri is not defined.');
+  if (dbType === 'mongodb' && !config.get('db.mongodb.uri')) {
+    throw new Error('FATAL ERROR: db.mongodb.uri is not defined.');
   }
 
   if (dbType === 'postgres') {
-    const requiredKeys = [
-      'db_host',
-      'db_port',
-      'db_user',
-      'db_password',
-      'db_schema',
-    ];
+    const requiredKeys = ['host', 'port', 'user', 'password', 'schema'];
 
     requiredKeys.forEach((key) => {
-      if (!config.get(key)) {
-        throw new Error(`FATAL ERROR: ${key} is not defined for postgres.`);
+      if (!config.get(`db.postgres.${key}`)) {
+        throw new Error(`FATAL ERROR: db.postgres.${key} is not defined.`);
       }
     });
   }

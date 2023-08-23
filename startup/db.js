@@ -10,7 +10,7 @@ module.exports = function () {
   if (USE_MONGO_DB) {
     winston.info('Using MongoDB');
 
-    const uri = config.get('mongodb_uri');
+    const uri = config.get('db.mongodb.uri');
     mongoose.connect(uri).then(() => winston.info('Connected to MongoDB...'));
 
     return;

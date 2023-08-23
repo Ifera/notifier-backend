@@ -1,13 +1,19 @@
 {
   "port": 3000,
 
-  "db_type": "postgres",
+  "db": {
+    "type": "mongodb",
 
-  "db_host": "localhost",
-  "db_port": "5432",
-  "db_user": "postgres",
-  "db_password": "gosaas",
-  "db_schema": "notifier_dev",
+    "mongodb": {
+      "uri": "mongodb://localhost:27017/notifier_dev"
+    },
 
-  "mongodb_uri": "mongodb://localhost:27017/notifier_dev"
+    "postgres": {
+      "host": "localhost",
+      "port": "5432",
+      "user": "postgres",
+      "password": "gosaas",
+      "schema": "notifier_dev"
+    }
+  }
 }

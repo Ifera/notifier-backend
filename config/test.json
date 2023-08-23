@@ -1,4 +1,19 @@
 {
-  "db_type": "mongodb",
-  "mongodb_uri": "mongodb://localhost:27017/notifier_test"
+  "port": 3000,
+
+  "db": {
+    "type": "mongodb",
+
+    "mongodb": {
+      "uri": "mongodb://localhost:27017/notifier_dev"
+    },
+
+    "postgres": {
+      "host": "localhost",
+      "port": "5432",
+      "user": "postgres",
+      "password": "gosaas",
+      "schema": "notifier_dev"
+    }
+  }
 }
