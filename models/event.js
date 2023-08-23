@@ -57,9 +57,6 @@ const schema = Joi.object({
   description: Joi.string().max(255),
   is_active: Joi.boolean(),
   is_deleted: Joi.boolean(),
-  application: USE_MONGO_DB
-    ? Joi.objectId()
-    : Joi.number().integer().positive(),
 });
 
 function validatePost(req) {

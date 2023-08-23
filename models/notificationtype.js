@@ -74,7 +74,6 @@ const schema = Joi.object({
   template_body: Joi.string().min(5),
   is_active: Joi.boolean(),
   is_deleted: Joi.boolean(),
-  event: USE_MONGO_DB ? Joi.objectId() : Joi.number().integer().positive(),
 });
 
 function validatePost(req) {
