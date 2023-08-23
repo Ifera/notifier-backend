@@ -119,10 +119,18 @@ async function deleteEvent(id) {
   return updateEvent(id, { is_active: false, is_deleted: true });
 }
 
+async function deleteEvents(ids) {
+  return knex('events')
+    .update({ is_active: false, is_deleted: true })
+    .whereIn('id', ids)
+    .returning('*');
+}
+
 module.exports = {
   createEvent,
   getEventByID,
   getEvents,
   updateEvent,
   deleteEvent,
+  deleteEvents,
 };

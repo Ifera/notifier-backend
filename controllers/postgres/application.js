@@ -118,12 +118,12 @@ async function deleteApp(id) {
   return updateApp(id, { is_active: false, is_deleted: true });
 }
 
-// async function deleteApps(ids) {
-//   return knex('applications')
-//     .update({ is_active: false, is_deleted: true })
-//     .whereIn('id', ids)
-//     .returning('*');
-// }
+async function deleteApps(ids) {
+  return knex('applications')
+    .update({ is_active: false, is_deleted: true })
+    .whereIn('id', ids)
+    .returning('*');
+}
 
 module.exports = {
   createApp,
@@ -131,4 +131,5 @@ module.exports = {
   getApps,
   updateApp,
   deleteApp,
+  deleteApps,
 };

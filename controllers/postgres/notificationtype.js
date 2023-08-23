@@ -161,10 +161,18 @@ async function deleteNotificationType(id) {
   return updateNotificationType((id, { is_active: false, is_deleted: true }));
 }
 
+async function deleteNotificationTypes(ids) {
+  return knex('notificationtypes')
+    .update({ is_active: false, is_deleted: true })
+    .whereIn('id', ids)
+    .returning('*');
+}
+
 module.exports = {
   createNotificationType,
   getNotificationTypeByID,
   getNotificationTypes,
   updateNotificationType,
   deleteNotificationType,
+  deleteNotificationTypes,
 };

@@ -3,9 +3,12 @@ const _ = require('lodash');
 
 const router = express.Router();
 
-const { validateReq, validateQueryParams } = require('../middleware/validate');
+const {
+  validateReq,
+  validateQueryParams,
+  validateBulkDelete,
+} = require('../middleware/validate');
 const validateObjectId = require('../middleware/validateObjectId');
-const { DB_TYPE } = require('../globals');
 
 const {
   validateQP,
@@ -13,6 +16,7 @@ const {
   validate,
   extractTags,
 } = require('../models/notificationtype');
+const { DB_TYPE } = require('../globals');
 
 const {
   createNotificationType,
@@ -20,6 +24,7 @@ const {
   getNotificationTypes,
   updateNotificationType,
   deleteNotificationType,
+  deleteNotificationTypes,
 } = require(`../controllers/${DB_TYPE}/notificationtype`); // eslint-disable-line
 
 const filteredProps = [
@@ -62,6 +67,14 @@ router.post('/', validateReq(validatePost), async (req, res) => {
   const event = await createNotificationType(req.body);
 
   return res.send(_.pick(event, filteredProps));
+});
+
+router.delete('/', validateBulkDelete, async (req, res) => {
+  const result = await deleteNotificationTypes(req.body.ids);
+
+  if (result.length === 0) return res.status(404).send('Nothing to delete.');
+
+  return res.send('Success');
 });
 
 router.delete('/:id', validateObjectId, async (req, res) => {
