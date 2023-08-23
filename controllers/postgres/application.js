@@ -115,9 +115,15 @@ async function updateApp(id, req) {
 }
 
 async function deleteApp(id) {
-  const ret = await knex('applications').delete().where({ id }).returning('*');
-  return !ret ? null : ret[0];
+  return updateApp(id, { is_active: false, is_deleted: true });
 }
+
+// async function deleteApps(ids) {
+//   return knex('applications')
+//     .update({ is_active: false, is_deleted: true })
+//     .whereIn('id', ids)
+//     .returning('*');
+// }
 
 module.exports = {
   createApp,

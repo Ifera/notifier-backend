@@ -108,7 +108,7 @@ async function getNotificationTypes({
     if (notif.tags) notif.tags = notif.tags.split(';');
   });
 
-  if (pageNumber <= 0) {
+  if (pageNumber <= 0 || totalNotifs <= 0) {
     return {
       current_page: 1,
       last_page: 1,
@@ -158,12 +158,7 @@ async function updateNotificationType(id, req) {
 }
 
 async function deleteNotificationType(id) {
-  const ret = await knex('notificationtypes')
-    .delete()
-    .where({ id })
-    .returning('*');
-
-  return !ret ? null : ret[0];
+  return updateNotificationType((id, { is_active: false, is_deleted: true }));
 }
 
 module.exports = {

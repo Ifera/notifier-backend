@@ -84,7 +84,7 @@ async function getEvents({
     query.andWhere('name', '~*', `.*${like}.*`); // Case-insensitive regex search
   }
 
-  if (pageNumber <= 0) {
+  if (pageNumber <= 0 || totalEvents <= 0) {
     return {
       current_page: 1,
       last_page: 1,
@@ -116,8 +116,7 @@ async function updateEvent(id, req) {
 }
 
 async function deleteEvent(id) {
-  const ret = await knex('events').delete().where({ id }).returning('*');
-  return !ret ? null : ret[0];
+  return updateEvent(id, { is_active: false, is_deleted: true });
 }
 
 module.exports = {
