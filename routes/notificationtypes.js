@@ -56,16 +56,12 @@ router.get('/:id', validateObjectId, async (req, res) => {
   return res.send(_.pick(nt, filteredProps));
 });
 
-router.post('/', validateReq(validatePost), async (req, res, next) => {
-  try {
-    // extract tags from the body and set it with the request body
-    req.body.tags = extractTags(req.body.template_body);
-    const event = await createNotificationType(req.body);
+router.post('/', validateReq(validatePost), async (req, res) => {
+  // extract tags from the body and set it with the request body
+  req.body.tags = extractTags(req.body.template_body);
+  const event = await createNotificationType(req.body);
 
-    return res.send(_.pick(event, filteredProps));
-  } catch (err) {
-    return next(err);
-  }
+  return res.send(_.pick(event, filteredProps));
 });
 
 router.delete('/:id', validateObjectId, async (req, res) => {

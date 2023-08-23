@@ -20,13 +20,9 @@ const filteredProps = [
   'delivered_at',
 ];
 
-router.post('/', validateReq(validatePost), async (req, res, next) => {
-  try {
-    const message = await createMessage(req.body);
-    return res.send(_.pick(message, filteredProps));
-  } catch (err) {
-    return next(err);
-  }
+router.post('/', validateReq(validatePost), async (req, res) => {
+  const message = await createMessage(req.body);
+  return res.send(_.pick(message, filteredProps));
 });
 
 module.exports = router;
