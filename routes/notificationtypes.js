@@ -11,6 +11,7 @@ const {
   validateQP,
   validatePost,
   validate,
+  extractTags,
 } = require('../models/notificationtype');
 
 const {
@@ -57,7 +58,10 @@ router.get('/:id', validateObjectId, async (req, res) => {
 
 router.post('/', validateReq(validatePost), async (req, res, next) => {
   try {
+    // extract tags from the body and set it with the request body
+    req.body.tags = extractTags(req.body.template_body);
     const event = await createNotificationType(req.body);
+
     return res.send(_.pick(event, filteredProps));
   } catch (err) {
     return next(err);
@@ -79,6 +83,14 @@ router.patch(
   '/:id',
   [validateObjectId, validateReq(validate)],
   async (req, res) => {
+    if (Object.keys(req.body).length === 0)
+      return res.status(400).send('request body should not be empty');
+
+    // extract tags from the body and set it with the request body
+    if (req.body.template_body) {
+      req.body.tags = extractTags(req.body.template_body);
+    }
+
     const event = await updateNotificationType(req.params.id, req.body);
 
     if (!event)

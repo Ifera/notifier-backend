@@ -7,7 +7,7 @@ exports.up = function (knex) {
     t.increments('id').unsigned().primary();
     t.string('label', 255).notNullable();
     t.dateTime('created_at').defaultTo(knex.raw('CURRENT_TIMESTAMP'));
-    t.index('label');
+    t.unique('label');
   });
 };
 

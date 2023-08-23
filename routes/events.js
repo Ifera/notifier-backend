@@ -64,6 +64,9 @@ router.patch(
   '/:id',
   [validateObjectId, validateReq(validate)],
   async (req, res) => {
+    if (Object.keys(req.body).length === 0)
+      return res.status(400).send('request body should not be empty');
+
     const event = await updateEvent(req.params.id, req.body);
 
     if (!event)

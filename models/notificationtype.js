@@ -55,16 +55,11 @@ const ntSchema = new mongoose.Schema({
 
 const NotificationType = mongoose.model('NotificationType', ntSchema);
 
-// the keys that will remain same for query, post and put
-const data = (required) => ({
-  event: USE_MONGO_DB
-    ? Joi.objectId().required(required)
-    : Joi.number().integer().positive().required(required),
-});
-
 function validateQP(req) {
   const _schema = qpSchema.keys({
-    ...data(true),
+    event: USE_MONGO_DB
+      ? Joi.objectId().required()
+      : Joi.number().integer().positive().required(),
   });
 
   return _schema.validate(req);
@@ -75,10 +70,10 @@ const schema = Joi.object({
   description: Joi.string().max(255),
   template_subject: Joi.string().min(5),
   template_body: Joi.string().min(5),
-  tags: Joi.array().items(Joi.string().min(3)),
+  // tags: Joi.array().items(Joi.string().min(3)),
   is_active: Joi.boolean(),
   is_deleted: Joi.boolean(),
-  ...data(false),
+  event: USE_MONGO_DB ? Joi.objectId() : Joi.number().integer().positive(),
 });
 
 function validatePost(req) {
@@ -86,7 +81,9 @@ function validatePost(req) {
     name: Joi.string().min(3).max(50).required(),
     template_subject: Joi.string().min(5).required(),
     template_body: Joi.string().min(5).required(),
-    ...data(true),
+    event: USE_MONGO_DB
+      ? Joi.objectId().required()
+      : Joi.number().integer().positive().required(),
   });
 
   return _schema.validate(req);
@@ -97,9 +94,23 @@ function validate(req) {
   return schema.validate(req);
 }
 
+function extractTags(str) {
+  const tagPattern = /{{(.*?)}}/g;
+  const tags = [];
+  let match;
+
+  // eslint-disable-next-line
+  while ((match = tagPattern.exec(str)) !== null) {
+    tags.push(match[1]);
+  }
+
+  return tags;
+}
+
 module.exports = {
   NotificationType,
   validateQP,
   validatePost,
   validate,
+  extractTags,
 };

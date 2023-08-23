@@ -1,4 +1,5 @@
 const knex = require('../../knex/knex');
+const { upsertTags } = require('./tag');
 
 async function createNotificationType(req) {
   const _req = { ...req };
@@ -6,12 +7,10 @@ async function createNotificationType(req) {
 
   const ret = await knex('notificationtypes').insert(_req).returning('*');
 
-  if (req.tags) {
-    const tags = req.tags.map((tag) => ({
-      label: tag,
-    }));
-
-    await knex('tags').insert(tags).onConflict('label').ignore();
+  // do this after creating the notification type
+  // so that in case of error, the tags are not upserted
+  if (ret && req.tags) {
+    await upsertTags(req.tags);
   }
 
   return !ret ? null : ret[0];
@@ -141,10 +140,19 @@ async function getNotificationTypes({
 }
 
 async function updateNotificationType(id, req) {
+  const _req = { ...req };
+  if (_req.tags) _req.tags = _req.tags.join(';');
+
   const ret = await knex('notificationtypes')
-    .update(req)
+    .update(_req)
     .where({ id })
     .returning('*');
+
+  // do this after updating the notification type
+  // so that in case of error, the tags are not upserted
+  if (ret && req.tags) {
+    await upsertTags(req.tags);
+  }
 
   return !ret ? null : ret[0];
 }

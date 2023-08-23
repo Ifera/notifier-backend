@@ -12,6 +12,8 @@ exports.up = function (knex) {
       t.boolean('is_deleted').notNullable().defaultTo(false);
       t.dateTime('created_at').defaultTo(knex.raw('CURRENT_TIMESTAMP'));
       t.dateTime('modified_at').defaultTo(knex.raw('CURRENT_TIMESTAMP'));
+
+      t.unique(['name']);
     })
     .then(() =>
       knex.raw(`

@@ -1,7 +1,7 @@
 const { NotificationType } = require('../../models/notificationtype');
 const { getEventByID } = require('./event');
 const { ValidationError } = require('../../utils/error');
-const Tag = require('../../models/tag');
+const { upsertTags } = require('./tag');
 
 async function createNotificationType(req) {
   if (!req.event) throw new ValidationError('"event" (event ID) is required');
@@ -11,15 +11,7 @@ async function createNotificationType(req) {
     throw new ValidationError('The event with the given ID was not found.');
 
   if (req.tags) {
-    const bulkUpdateTags = req.tags.map((tag) => ({
-      updateOne: {
-        filter: { label: tag },
-        update: { $setOnInsert: { label: tag } },
-        upsert: true,
-      },
-    }));
-
-    await Tag.bulkWrite(bulkUpdateTags);
+    await upsertTags(req.tags);
   }
 
   const notif = new NotificationType(req);
@@ -124,7 +116,13 @@ async function updateNotificationType(id, obj) {
   Object.assign(notif, obj);
   notif.modified_at = Date.now();
 
-  return notif.save();
+  const ret = await notif.save();
+
+  if (ret && notif.tags) {
+    await upsertTags(notif.tags);
+  }
+
+  return ret;
 }
 
 async function deleteNotificationType(id) {

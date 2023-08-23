@@ -41,16 +41,11 @@ const eventSchema = new mongoose.Schema({
 
 const Event = mongoose.model('Event', eventSchema);
 
-// the keys that will remain same for query, post and put
-const data = (required) => ({
-  application: USE_MONGO_DB
-    ? Joi.objectId().required(required)
-    : Joi.number().integer().positive().required(required),
-});
-
 function validateQP(req) {
   const _schema = qpSchema.keys({
-    ...data(false),
+    application: USE_MONGO_DB
+      ? Joi.objectId().required()
+      : Joi.number().integer().positive().required(),
   });
 
   return _schema.validate(req);
@@ -61,13 +56,17 @@ const schema = Joi.object({
   description: Joi.string().max(255),
   is_active: Joi.boolean(),
   is_deleted: Joi.boolean(),
-  ...data(false),
+  application: USE_MONGO_DB
+    ? Joi.objectId()
+    : Joi.number().integer().positive(),
 });
 
 function validatePost(req) {
   const _schema = schema.keys({
     name: Joi.string().min(3).max(50).required(),
-    ...data(true),
+    application: USE_MONGO_DB
+      ? Joi.objectId().required()
+      : Joi.number().integer().positive().required(),
   });
 
   return _schema.validate(req);
