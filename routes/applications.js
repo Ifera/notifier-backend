@@ -12,6 +12,7 @@ const validateObjectId = require('../middleware/validateObjectId');
 
 const { validateQP, validatePost, validate } = require('../models/application');
 const { DB_TYPE } = require('../globals');
+const { BadRequest, NotFound } = require('../utils/error');
 
 const {
   createApp,
@@ -41,8 +42,7 @@ router.get('/', validateQueryParams(validateQP), async (req, res) => {
 router.get('/:id', validateObjectId, async (req, res) => {
   const app = await getAppByID(req.params.id);
 
-  if (!app)
-    return res.status(404).send('The app with the given ID was not found.');
+  if (!app) throw new NotFound('The app with the given ID was not found.');
 
   return res.send(_.pick(app, filteredProps));
 });
@@ -55,7 +55,7 @@ router.post('/', validateReq(validatePost), async (req, res) => {
 router.delete('/', validateBulkDelete, async (req, res) => {
   const result = await deleteApps(req.body.ids);
 
-  if (result.length === 0) return res.status(404).send('Nothing to delete.');
+  if (result.length === 0) throw new NotFound('Nothing to delete.');
 
   return res.send('Success');
 });
@@ -63,8 +63,7 @@ router.delete('/', validateBulkDelete, async (req, res) => {
 router.delete('/:id', validateObjectId, async (req, res) => {
   const result = await deleteApp(req.params.id);
 
-  if (!result)
-    return res.status(404).send('The app with the given ID was not found.');
+  if (!result) throw new NotFound('The app with the given ID was not found.');
 
   return res.send('Success');
 });
@@ -74,12 +73,11 @@ router.patch(
   [validateObjectId, validateReq(validate)],
   async (req, res) => {
     if (Object.keys(req.body).length === 0)
-      return res.status(400).send('request body should not be empty');
+      throw new BadRequest('The request body should not be empty');
 
     const app = await updateApp(req.params.id, req.body);
 
-    if (!app)
-      return res.status(404).send('The app with the given ID was not found.');
+    if (!app) throw new NotFound('The app with the given ID was not found.');
 
     return res.send(_.pick(app, filteredProps));
   },

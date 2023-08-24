@@ -1,14 +1,14 @@
 const { NotificationType } = require('../../models/notificationtype');
 const { getEventByID } = require('./event');
-const { ValidationError } = require('../../utils/error');
+const { BadRequest } = require('../../utils/error');
 const { upsertTags } = require('./tag');
 
 async function createNotificationType(req) {
-  if (!req.event) throw new ValidationError('"event" (event ID) is required');
+  if (!req.event) throw new BadRequest('"event" (event ID) is required');
 
   const event = await getEventByID(req.event);
   if (!event)
-    throw new ValidationError('The event with the given ID was not found.');
+    throw new BadRequest('The event with the given ID was not found.');
 
   if (req.tags) {
     await upsertTags(req.tags);

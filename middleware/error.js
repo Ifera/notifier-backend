@@ -1,9 +1,10 @@
 const winston = require('winston');
-const { ValidationError } = require('../utils/error');
+const { StatusCodes } = require('http-status-codes');
+const { CustomError } = require('../utils/error');
 
 module.exports = function (err, req, res, next) {
-  if (err instanceof ValidationError) {
-    return res.status(400).send(err.message);
+  if (err instanceof CustomError) {
+    return res.status(err.statusCode).send(err.message);
   }
 
   if (err.detail) {
@@ -14,11 +15,15 @@ module.exports = function (err, req, res, next) {
     const keys = Object.keys(err.keyValue).join(', ');
     const values = Object.values(err.keyValue).join(', ');
 
-    return res.status(400).send(`Key (${keys})=(${values}) already exists.`);
+    return res
+      .status(StatusCodes.CONFLICT)
+      .send(`Key (${keys})=(${values}) already exists.`);
   }
 
   winston.error(err);
   winston.error(err.stack);
 
-  return res.status(500).send('Something failed.');
+  return res
+    .status(StatusCodes.INTERNAL_SERVER_ERROR)
+    .send('Something failed.');
 };

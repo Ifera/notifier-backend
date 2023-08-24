@@ -1,8 +1,18 @@
 const { Application } = require('../../models/application');
 const { Event } = require('../../models/event');
 const { NotificationType } = require('../../models/notificationtype');
+const { ConflictError } = require('../../utils/error');
 
 async function createApp(req) {
+  // check if app with same name already exists
+  const appExists = await Application.findOne({
+    name: req.name,
+    is_deleted: false,
+  });
+
+  if (appExists)
+    throw new ConflictError('Application with the same name already exists');
+
   const app = new Application(req);
 
   return app.save();

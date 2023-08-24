@@ -17,6 +17,7 @@ const {
   extractTags,
 } = require('../models/notificationtype');
 const { DB_TYPE } = require('../globals');
+const { BadRequest, NotFound } = require('../utils/error');
 
 const {
   createNotificationType,
@@ -54,9 +55,9 @@ router.get('/:id', validateObjectId, async (req, res) => {
   const nt = await getNotificationTypeByID(req.params.id);
 
   if (!nt)
-    return res
-      .status(404)
-      .send('The notification type with the given ID was not found.');
+    throw new NotFound(
+      'The notification type with the given ID was not found.',
+    );
 
   return res.send(_.pick(nt, filteredProps));
 });
@@ -72,7 +73,7 @@ router.post('/', validateReq(validatePost), async (req, res) => {
 router.delete('/', validateBulkDelete, async (req, res) => {
   const result = await deleteNotificationTypes(req.body.ids);
 
-  if (result.length === 0) return res.status(404).send('Nothing to delete.');
+  if (result.length === 0) throw new NotFound('Nothing to delete.');
 
   return res.send('Success');
 });
@@ -81,9 +82,9 @@ router.delete('/:id', validateObjectId, async (req, res) => {
   const result = await deleteNotificationType(req.params.id);
 
   if (!result)
-    return res
-      .status(404)
-      .send('The notification type with the given ID was not found.');
+    throw new NotFound(
+      'The notification type with the given ID was not found.',
+    );
 
   return res.send('Success');
 });
@@ -93,7 +94,7 @@ router.patch(
   [validateObjectId, validateReq(validate)],
   async (req, res) => {
     if (Object.keys(req.body).length === 0)
-      return res.status(400).send('request body should not be empty');
+      throw new BadRequest('The request body should not be empty');
 
     // extract tags from the body and set it with the request body
     if (req.body.template_body) {
@@ -103,9 +104,9 @@ router.patch(
     const event = await updateNotificationType(req.params.id, req.body);
 
     if (!event)
-      return res
-        .status(404)
-        .send('The notification type with the given ID was not found.');
+      throw new NotFound(
+        'The notification type with the given ID was not found.',
+      );
 
     return res.send(_.pick(event, filteredProps));
   },

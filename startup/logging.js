@@ -27,16 +27,6 @@ module.exports = function () {
     ],
   });
 
-  // winston.exceptions.handle(
-  //   new winston.transports.File({
-  //     filename: './logs/exceptions.log',
-  //     format: winston.format.json(),
-  //   }),
-  //   new winston.transports.Console({
-  //     format: winston.format.simple(),
-  //   }),
-  // );
-
   // if (process.env.NODE_ENV !== "production") {
   // winston.add(
   //   new winston.transports.Console({

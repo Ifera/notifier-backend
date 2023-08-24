@@ -3,12 +3,12 @@ const knex = require('../../knex/knex');
 const { getAppByID } = require('./application');
 const { getEventByID } = require('./event');
 const { getNotificationTypeByID } = require('./notificationtype');
-const { ValidationError } = require('../../utils/error');
+const { BadRequest } = require('../../utils/error');
 
 async function createMessage(req) {
   // first check if notification type is provided
   if (!req.notification_type)
-    throw new ValidationError(
+    throw new BadRequest(
       '"notification_type" (notification type ID) is required',
     );
 
@@ -16,12 +16,12 @@ async function createMessage(req) {
   const notif = await getNotificationTypeByID(req.notification_type);
 
   if (!notif)
-    throw new ValidationError(
+    throw new BadRequest(
       'The notification type with the given ID was not found.',
     );
 
   if (!notif.is_active) {
-    throw new ValidationError('The notification type is inactive.');
+    throw new BadRequest('The notification type is inactive.');
   }
 
   // check if event exists and is active + not deleted
@@ -33,9 +33,7 @@ async function createMessage(req) {
     );
 
   if (!event.is_active)
-    throw new ValidationError(
-      'The event for this notification type is inactive.',
-    );
+    throw new BadRequest('The event for this notification type is inactive.');
 
   // check if application exists and is active + not deleted
   const app = await getAppByID(event.application);
@@ -46,7 +44,7 @@ async function createMessage(req) {
     );
 
   if (!app.is_active)
-    throw new ValidationError(
+    throw new BadRequest(
       'The application for this notification type is inactive.',
     );
 
@@ -65,9 +63,7 @@ async function createMessage(req) {
 
     const { error } = metadataSchema.validate(metadata);
     if (error)
-      throw new ValidationError(
-        `${error.details[0].message} in metadata object`,
-      );
+      throw new BadRequest(`${error.details[0].message} in metadata object`);
 
     Object.keys(metadata).forEach((key) => {
       body = body.replace(`{{${key}}}`, metadata[key]);

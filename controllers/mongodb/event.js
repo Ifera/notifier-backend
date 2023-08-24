@@ -1,17 +1,15 @@
 const { Event } = require('../../models/event');
 const { NotificationType } = require('../../models/notificationtype');
 const { getAppByID } = require('./application');
-const { ValidationError } = require('../../utils/error');
+const { BadRequest } = require('../../utils/error');
 
 async function createEvent(req) {
   if (!req.application)
-    throw new ValidationError('"application" (application ID) is required');
+    throw new BadRequest('"application" (application ID) is required');
 
   const app = await getAppByID(req.application);
   if (!app)
-    throw new ValidationError(
-      'The application with the given ID was not found.',
-    );
+    throw new BadRequest('The application with the given ID was not found.');
 
   const event = new Event(req);
 
