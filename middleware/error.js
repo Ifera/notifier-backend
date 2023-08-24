@@ -8,7 +8,7 @@ module.exports = function (err, req, res, next) {
   }
 
   // if (err.detail) {
-  //   return res.status(400).send(err.detail);
+  //   return res.status(StatusCodes.BAD_REQUEST).send(err.detail);
   // }
 
   // if (err.code === 11000) {

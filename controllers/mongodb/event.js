@@ -7,7 +7,9 @@ async function createEvent(req) {
   if (!req.application)
     throw new BadRequest('"application" (application ID) is required');
 
+  // check if application exists
   const app = await getAppByID(req.application);
+
   if (!app)
     throw new BadRequest('The application with the given ID was not found.');
 

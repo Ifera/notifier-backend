@@ -24,7 +24,7 @@ async function createMessage(req) {
     throw new BadRequest('The notification type is inactive.');
   }
 
-  // check if event exists and is active + not deleted
+  // check if event exists and is active
   const event = await getEventByID(notif.event);
 
   if (!event)
@@ -35,7 +35,7 @@ async function createMessage(req) {
   if (!event.is_active)
     throw new BadRequest('The event for this notification type is inactive.');
 
-  // check if application exists and is active + not deleted
+  // check if application exists and is active
   const app = await getAppByID(event.application);
 
   if (!app)
@@ -62,6 +62,7 @@ async function createMessage(req) {
     });
 
     const { error } = metadataSchema.validate(metadata);
+
     if (error)
       throw new BadRequest(`${error.details[0].message} in metadata object`);
 

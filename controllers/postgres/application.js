@@ -1,15 +1,24 @@
 const knex = require('../../knex/knex');
+const { ConflictError } = require('../../utils/error');
 
 async function createApp(req) {
+  // check if app with same name already exists
+  const appExists = await knex('applications')
+    .where({ name: req.name, is_deleted: false })
+    .first();
+
+  if (appExists)
+    throw new ConflictError('Application with the same name already exists');
+
   const ret = await knex('applications').insert(req).returning('*');
+
   return !ret ? null : ret[0];
 }
 
 async function getAppByID(id) {
   return knex('applications')
     .select('*')
-    .where({ id })
-    .andWhere('is_deleted', false)
+    .where({ id, is_deleted: false })
     .first();
 }
 

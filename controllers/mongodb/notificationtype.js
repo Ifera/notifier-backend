@@ -7,6 +7,7 @@ async function createNotificationType(req) {
   if (!req.event) throw new BadRequest('"event" (event ID) is required');
 
   const event = await getEventByID(req.event);
+
   if (!event)
     throw new BadRequest('The event with the given ID was not found.');
 

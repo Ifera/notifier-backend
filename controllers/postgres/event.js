@@ -1,16 +1,38 @@
 const knex = require('../../knex/knex');
+const { getAppByID } = require('./application');
+const { BadRequest, ConflictError } = require('../../utils/error');
 
 async function createEvent(req) {
+  if (!req.application)
+    throw new BadRequest('"application" (application ID) is required');
+
+  // check if application exists
+  const app = await getAppByID(req.application);
+
+  if (!app)
+    throw new BadRequest('The application with the given ID was not found.');
+
+  // check if event with same name and application id already exists
+  const eventExists = await knex('events')
+    .where({
+      name: req.name,
+      application: req.application,
+      is_deleted: false,
+    })
+    .first();
+
+  if (eventExists)
+    throw new ConflictError(
+      'Event with the same name and application ID already exists',
+    );
+
   const ret = await knex('events').insert(req).returning('*');
+
   return !ret ? null : ret[0];
 }
 
 async function getEventByID(id) {
-  return knex('events')
-    .select('*')
-    .where({ id })
-    .andWhere('is_deleted', false)
-    .first();
+  return knex('events').select('*').where({ id, is_deleted: false }).first();
 }
 
 /**

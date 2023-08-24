@@ -1,7 +1,31 @@
 const knex = require('../../knex/knex');
 const { upsertTags } = require('./tag');
+const { getEventByID } = require('./event');
+const { BadRequest, ConflictError } = require('../../utils/error');
 
 async function createNotificationType(req) {
+  if (!req.event) throw new BadRequest('"event" (event ID) is required');
+
+  // check if event exists
+  const event = await getEventByID(req.event);
+
+  if (!event)
+    throw new BadRequest('The event with the given ID was not found.');
+
+  // check if notification type with same name and event ID already exists
+  const notifExists = await knex('notificationtypes')
+    .where({
+      name: req.name,
+      event: req.event,
+      is_deleted: false,
+    })
+    .first();
+
+  if (notifExists)
+    throw new ConflictError(
+      'Notification type with the same name and event ID already exists',
+    );
+
   const _req = { ...req };
   if (_req.tags) _req.tags = _req.tags.join(';');
 
@@ -19,8 +43,7 @@ async function createNotificationType(req) {
 async function getNotificationTypeByID(id) {
   const notif = await knex('notificationtypes')
     .select('*')
-    .where({ id })
-    .andWhere('is_deleted', false)
+    .where({ id, is_deleted: false })
     .first();
 
   if (!notif) return null;
