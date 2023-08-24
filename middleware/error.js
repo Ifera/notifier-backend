@@ -7,20 +7,19 @@ module.exports = function (err, req, res, next) {
     return res.status(err.statusCode).send(err.message);
   }
 
-  if (err.detail) {
-    return res.status(400).send(err.detail);
-  }
+  // if (err.detail) {
+  //   return res.status(400).send(err.detail);
+  // }
 
-  if (err.code === 11000) {
-    const keys = Object.keys(err.keyValue).join(', ');
-    const values = Object.values(err.keyValue).join(', ');
+  // if (err.code === 11000) {
+  //   const keys = Object.keys(err.keyValue).join(', ');
+  //   const values = Object.values(err.keyValue).join(', ');
 
-    return res
-      .status(StatusCodes.CONFLICT)
-      .send(`Key (${keys})=(${values}) already exists.`);
-  }
+  //   return res
+  //     .status(StatusCodes.CONFLICT)
+  //     .send(`Key (${keys})=(${values}) already exists.`);
+  // }
 
-  winston.error(err);
   winston.error(err.stack);
 
   return res
