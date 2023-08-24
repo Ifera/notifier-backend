@@ -13,7 +13,7 @@ exports.up = function (knex) {
       t.dateTime('created_at').defaultTo(knex.raw('CURRENT_TIMESTAMP'));
       t.dateTime('modified_at').defaultTo(knex.raw('CURRENT_TIMESTAMP'));
 
-      t.unique(['name']);
+      // t.unique(['name']);
     })
     .then(() =>
       knex.raw(`

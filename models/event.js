@@ -38,7 +38,7 @@ const eventSchema = new mongoose.Schema({
   },
 });
 
-eventSchema.index({ name: 1, application: 1 }, { unique: true });
+// eventSchema.index({ name: 1, application: 1 }, { unique: true });
 
 const Event = mongoose.model('Event', eventSchema);
 

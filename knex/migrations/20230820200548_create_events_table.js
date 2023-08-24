@@ -20,7 +20,7 @@ exports.up = function (knex) {
         .onDelete('CASCADE');
 
       t.index('application');
-      t.unique(['application', 'name']);
+      // t.unique(['application', 'name']);
     })
     .then(() =>
       knex.raw(`

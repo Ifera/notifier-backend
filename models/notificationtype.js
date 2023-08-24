@@ -53,7 +53,7 @@ const ntSchema = new mongoose.Schema({
   },
 });
 
-ntSchema.index({ name: 1, event: 1 }, { unique: true });
+// ntSchema.index({ name: 1, event: 1 }, { unique: true });
 
 const NotificationType = mongoose.model('NotificationType', ntSchema);
 

@@ -62,6 +62,7 @@ async function createMessage(req) {
     });
 
     const { error } = metadataSchema.validate(metadata);
+
     if (error)
       throw new BadRequest(`${error.details[0].message} in metadata object`);
 

@@ -1,7 +1,7 @@
 const { Event } = require('../../models/event');
 const { NotificationType } = require('../../models/notificationtype');
 const { getAppByID } = require('./application');
-const { BadRequest } = require('../../utils/error');
+const { BadRequest, ConflictError } = require('../../utils/error');
 
 async function createEvent(req) {
   if (!req.application)
@@ -10,6 +10,18 @@ async function createEvent(req) {
   const app = await getAppByID(req.application);
   if (!app)
     throw new BadRequest('The application with the given ID was not found.');
+
+  // check if event with same name and application id already exists
+  const eventExists = await Event.findOne({
+    name: req.name,
+    application: req.application,
+    is_deleted: false,
+  });
+
+  if (eventExists)
+    throw new ConflictError(
+      'Event with the same name and application ID already exists',
+    );
 
   const event = new Event(req);
 
@@ -60,7 +72,7 @@ async function getEvents({
   isActive = true,
 }) {
   if (!application)
-    throw new Error('"application" (application ID) is required');
+    throw new BadRequest('"application" (application ID) is required');
 
   pageNumber = Number(pageNumber);
   pageSize = Number(pageSize);

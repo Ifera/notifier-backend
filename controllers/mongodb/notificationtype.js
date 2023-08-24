@@ -1,6 +1,6 @@
 const { NotificationType } = require('../../models/notificationtype');
 const { getEventByID } = require('./event');
-const { BadRequest } = require('../../utils/error');
+const { BadRequest, ConflictError } = require('../../utils/error');
 const { upsertTags } = require('./tag');
 
 async function createNotificationType(req) {
@@ -9,6 +9,18 @@ async function createNotificationType(req) {
   const event = await getEventByID(req.event);
   if (!event)
     throw new BadRequest('The event with the given ID was not found.');
+
+  // check if notification type with same name and event id already exists
+  const notifExists = await NotificationType.findOne({
+    name: req.name,
+    event: req.event,
+    is_deleted: false,
+  });
+
+  if (notifExists)
+    throw new ConflictError(
+      'Notification type with the same name and event ID already exists',
+    );
 
   if (req.tags) {
     await upsertTags(req.tags);
