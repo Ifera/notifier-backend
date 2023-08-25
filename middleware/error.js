@@ -11,16 +11,8 @@ module.exports = function (err, req, res, next) {
   //   return res.status(StatusCodes.BAD_REQUEST).send(err.detail);
   // }
 
-  // if (err.code === 11000) {
-  //   const keys = Object.keys(err.keyValue).join(', ');
-  //   const values = Object.values(err.keyValue).join(', ');
-
-  //   return res
-  //     .status(StatusCodes.CONFLICT)
-  //     .send(`Key (${keys})=(${values}) already exists.`);
-  // }
-
-  winston.error(err.stack);
+  const logger = winston.child({ traceID: req.traceID });
+  logger.error(err.stack);
 
   return res
     .status(StatusCodes.INTERNAL_SERVER_ERROR)

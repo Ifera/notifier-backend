@@ -1,43 +1,58 @@
 const winston = require('winston');
 const config = require('config');
 
+const { format, transports } = winston;
+
+const logFormat = format.printf(
+  ({ timestamp, level, message, meta, ...opts }) => {
+    let traceID;
+
+    if (meta && meta.traceID) {
+      traceID = meta.traceID;
+    } else if (opts.traceID) {
+      traceID = opts.traceID;
+    } else {
+      traceID = '-';
+    }
+
+    return `[${timestamp}] [${level}] [${traceID}] ${message}`;
+  },
+);
+
+const combinedFormat = format.combine(
+  format.timestamp({ format: 'DD-MM-YYYY HH:mm:ss' }),
+  logFormat,
+);
+
 module.exports = function () {
   winston.configure({
     level: config.get('log.level'),
-    format: winston.format.simple(),
+    format: combinedFormat,
     transports: [
-      new winston.transports.File({
+      new transports.File({
         filename: './logs/error.log',
         level: 'error',
+        format: combinedFormat,
       }),
-      // new winston.transports.File({ filename: './logs/combined.log' }),
-      new winston.transports.Console({
-        format: winston.format.combine(
-          winston.format.colorize(),
-          winston.format.simple(),
-        ),
-      }),
+      new winston.transports.File({ filename: './logs/combined.log' }),
     ],
     exceptionHandlers: [
-      new winston.transports.File({
+      new transports.File({
         filename: './logs/exceptions.log',
       }),
-      new winston.transports.Console({
-        format: winston.format.simple(),
+      new transports.Console({
+        format: combinedFormat,
       }),
     ],
   });
 
-  // if (process.env.NODE_ENV !== "production") {
-  // winston.add(
-  //   new winston.transports.Console({
-  //     format: winston.format.combine(
-  //       winston.format.colorize(),
-  //       winston.format.simple(),
-  //     ),
-  //   }),
-  // );
-  // }
+  if (config.get('log.console')) {
+    winston.add(
+      new transports.Console({
+        format: format.combine(format.colorize(), combinedFormat),
+      }),
+    );
+  }
 
   process.on('unhandledRejection', (ex) => {
     throw ex;
@@ -45,3 +60,6 @@ module.exports = function () {
 
   winston.debug('init logging');
 };
+
+module.exports.logFormat = logFormat;
+module.exports.combinedFormat = combinedFormat;

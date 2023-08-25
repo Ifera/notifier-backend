@@ -2,6 +2,8 @@ const express = require('express');
 const winston = require('winston');
 
 // middleware
+const traceId = require('../middleware/traceId');
+const logger = require('../middleware/logger');
 const error = require('../middleware/error');
 
 // routes
@@ -21,6 +23,9 @@ module.exports = function (app) {
 
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
+
+  app.use(traceId);
+  app.use(logger.expressLogger);
 
   addRoute(app, '/api/apps', apps);
   addRoute(app, '/api/events', events);
