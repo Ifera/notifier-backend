@@ -1,8 +1,9 @@
 const winston = require('winston');
+const config = require('config');
 
 module.exports = function () {
   winston.configure({
-    level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
+    level: config.get('log.level'),
     format: winston.format.simple(),
     transports: [
       new winston.transports.File({
