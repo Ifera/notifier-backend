@@ -80,7 +80,7 @@ async function createMessage(req) {
 
   const ret = await knex('messages').insert(_req).returning('*');
 
-  return !ret ? null : ret[0];
+  return ret.length === 0 ? null : ret[0];
 }
 
 module.exports = {

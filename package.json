@@ -6,9 +6,9 @@
   "scripts": {
     "lint": "eslint --fix main.js",
     "format": "prettier -w .",
-    "prod": "NODE_ENV=production node main.js",
-    "dev": "NODE_ENV=development nodemon main.js",
-    "test": "NODE_ENV=test jest --watchAll --verbose --detectOpenHandles"
+    "prod": "clear && NODE_ENV=production node main.js",
+    "dev": "clear && NODE_ENV=development nodemon main.js",
+    "test": "clear && NODE_ENV=test jest --watchAll --verbose --detectOpenHandles"
   },
   "keywords": [],
   "author": "",

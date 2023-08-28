@@ -37,7 +37,7 @@ async function createNotificationType(req) {
     await upsertTags(req.tags);
   }
 
-  return !ret ? null : ret[0];
+  return ret.length === 0 ? null : ret[0];
 }
 
 async function getNotificationTypeByID(id) {

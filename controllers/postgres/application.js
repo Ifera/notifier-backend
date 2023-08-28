@@ -64,8 +64,7 @@ async function getApps({
 
   const totalAppsQuery = knex('applications')
     .count('id as totalApps')
-    .where('is_deleted', false)
-    .andWhere('is_active', isActive)
+    .where({ is_deleted: false, is_active: isActive })
     .first();
 
   // Filter by name using regex (matches anywhere in the name)
@@ -79,8 +78,7 @@ async function getApps({
 
   const query = knex('applications')
     .select('*')
-    .where('is_deleted', false)
-    .andWhere('is_active', isActive)
+    .where({ is_deleted: false, is_active: isActive })
     .orderBy(sortBy, sortDirection)
     .returning('*');
 
@@ -120,7 +118,7 @@ async function updateApp(id, req) {
     .where({ id })
     .returning('*');
 
-  return !ret ? null : ret[0];
+  return ret.length === 0 ? null : ret[0];
 }
 
 async function deleteApp(id) {

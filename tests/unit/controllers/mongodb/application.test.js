@@ -20,7 +20,7 @@ jest.mock('../../../../models/notificationtype');
 // Import necessary error classes for testing
 const { ConflictError, NotFound } = require('../../../../utils/error');
 
-describe('Application Controller', () => {
+describe('MongoDB Application Controller', () => {
   afterEach(() => {
     jest.clearAllMocks();
   });

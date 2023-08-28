@@ -134,7 +134,7 @@ async function getEvents({
 
 async function updateEvent(id, req) {
   const ret = await knex('events').update(req).where({ id }).returning('*');
-  return !ret ? null : ret[0];
+  return ret.length === 0 ? null : ret[0];
 }
 
 async function deleteEvent(id) {
