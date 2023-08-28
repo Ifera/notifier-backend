@@ -1,5 +1,6 @@
 const request = require('supertest');
-const config = require('config');
+const { StatusCodes } = require('http-status-codes');
+
 const mongoose = require('mongoose');
 const { Application } = require('../../../models/application');
 
@@ -19,7 +20,7 @@ describe('/api/apps', () => {
     it('should return 400 if invalid query parameters are passed', async () => {
       const res = await request(server).get('/api/apps/?sortBy=id&sortOrder=0');
 
-      expect(res.status).toBe(400);
+      expect(res.status).toBe(StatusCodes.BAD_REQUEST);
     });
 
     it('should return all apps', async () => {
@@ -45,7 +46,7 @@ describe('/api/apps', () => {
 
       const res = await request(server).get('/api/apps/');
 
-      expect(res.status).toBe(200);
+      expect(res.status).toBe(StatusCodes.OK);
       expect(res.body.apps.length).toBe(3);
       expect(res.body.apps.some((a) => a.name === 'ets')).toBeTruthy();
       expect(res.body.apps.some((a) => a.name === 'egs')).toBeTruthy();
@@ -75,7 +76,7 @@ describe('/api/apps', () => {
 
       const res = await request(server).get('/api/apps/');
 
-      expect(res.status).toBe(200);
+      expect(res.status).toBe(StatusCodes.OK);
       expect(res.body.apps.length).toBe(2);
       expect(res.body.apps.some((a) => a.name === 'ets')).toBeTruthy();
       expect(res.body.apps.some((a) => a.name === 'xyz')).toBeTruthy();
@@ -106,14 +107,14 @@ describe('/api/apps', () => {
         '/api/apps/?pageNumber=1&pageSize=2',
       );
 
-      expect(res1.status).toBe(200);
+      expect(res1.status).toBe(StatusCodes.OK);
       expect(res1.body.apps.length).toBe(2);
 
       const res2 = await request(server).get(
         '/api/apps/?pageNumber=2&pageSize=2',
       );
 
-      expect(res2.status).toBe(200);
+      expect(res2.status).toBe(StatusCodes.OK);
       expect(res2.body.apps.length).toBe(1);
     });
 
@@ -142,7 +143,7 @@ describe('/api/apps', () => {
         '/api/apps/?sortBy=name&sortOrder=1',
       );
 
-      expect(res.status).toBe(200);
+      expect(res.status).toBe(StatusCodes.OK);
       expect(res.body.apps.length).toBe(3);
       expect(res.body.apps[0].name).toBe('egs');
       expect(res.body.apps[1].name).toBe('ets');
@@ -172,7 +173,7 @@ describe('/api/apps', () => {
 
       const res = await request(server).get('/api/apps/?like=e');
 
-      expect(res.status).toBe(200);
+      expect(res.status).toBe(StatusCodes.OK);
       expect(res.body.apps.length).toBe(2);
       expect(res.body.apps.some((a) => a.name === 'ets')).toBeTruthy();
       expect(res.body.apps.some((a) => a.name === 'egs')).toBeTruthy();
@@ -191,29 +192,25 @@ describe('/api/apps', () => {
 
       const res = await request(server).get(`/api/apps/${app._id}`);
 
-      expect(res.status).toBe(200);
+      expect(res.status).toBe(StatusCodes.OK);
       expect(res.body).toHaveProperty('name', app.name);
     });
 
     it('should return 404 if invalid id is passed', async () => {
       const res = await request(server).get('/api/apps/1');
 
-      expect(res.status).toBe(404);
+      expect(res.status).toBe(StatusCodes.NOT_FOUND);
     });
 
     it('should return 404 if no app with the given id exists', async () => {
       const id = new mongoose.Types.ObjectId();
-      const res = await request(server).get(`/api/genres/${id}`);
+      const res = await request(server).get(`/api/apps/${id}`);
 
-      expect(res.status).toBe(404);
+      expect(res.status).toBe(StatusCodes.NOT_FOUND);
     });
   });
 
   describe('POST /', () => {
-    // Define the happy path, and then in each test, we change
-    // one parameter that clearly aligns with the name of the
-    // test.
-
     let name;
 
     const exec = async () => request(server).post('/api/apps').send({ name });
@@ -227,7 +224,7 @@ describe('/api/apps', () => {
 
       const res = await exec();
 
-      expect(res.status).toBe(400);
+      expect(res.status).toBe(StatusCodes.BAD_REQUEST);
     });
 
     it('should return 400 if name is more than 50 characters', async () => {
@@ -235,28 +232,38 @@ describe('/api/apps', () => {
 
       const res = await exec();
 
-      expect(res.status).toBe(400);
+      expect(res.status).toBe(StatusCodes.BAD_REQUEST);
     });
 
     it('should return 400 if invalid property is passed in body', async () => {
       const res = await request(server)
         .post('/api/apps')
-        .send({ name: 'app', namea: 'invalid' });
+        .send({ name: 'app', invalid: 'invalid' });
 
-      expect(res.status).toBe(400);
+      expect(res.status).toBe(StatusCodes.BAD_REQUEST);
+    });
+
+    it('should return 409 if app with the same name already exists', async () => {
+      const app = new Application({ name: 'app' });
+      await app.save();
+
+      const res = await exec();
+
+      expect(res.status).toBe(StatusCodes.CONFLICT);
     });
 
     it('should save the app if it is valid', async () => {
-      await exec();
-
+      const res = await exec();
       const app = await Application.find({ name: 'app' });
 
+      expect(res.status).toBe(StatusCodes.OK);
       expect(app).not.toBeNull();
     });
 
     it('should return the app if it is valid', async () => {
       const res = await exec();
 
+      expect(res.status).toBe(StatusCodes.OK);
       expect(res.body).toHaveProperty('id');
       expect(res.body).toHaveProperty('name', 'app');
     });
@@ -280,7 +287,7 @@ describe('/api/apps', () => {
 
       const res = await exec();
 
-      expect(res.status).toBe(404);
+      expect(res.status).toBe(StatusCodes.NOT_FOUND);
     });
 
     it('should return 404 if no app with the given id was found', async () => {
@@ -288,16 +295,16 @@ describe('/api/apps', () => {
 
       const res = await exec();
 
-      expect(res.status).toBe(404);
+      expect(res.status).toBe(StatusCodes.NOT_FOUND);
     });
 
     it('should delete the app if input is valid', async () => {
-      await exec();
+      const res = await exec();
+      const res2 = await Application.findById(id);
 
-      const res = await Application.findById(id);
-
-      expect(res.is_deleted).toBeTruthy();
-      expect(res.is_active).toBeFalsy();
+      expect(res.status).toBe(StatusCodes.OK);
+      expect(res2.is_deleted).toBeTruthy();
+      expect(res2.is_active).toBeFalsy();
     });
   });
 
@@ -322,7 +329,7 @@ describe('/api/apps', () => {
 
       const res = await exec();
 
-      expect(res.status).toBe(400);
+      expect(res.status).toBe(StatusCodes.BAD_REQUEST);
     });
 
     it('should return 400 if app name is more than 50 characters', async () => {
@@ -330,7 +337,7 @@ describe('/api/apps', () => {
 
       const res = await exec();
 
-      expect(res.status).toBe(400);
+      expect(res.status).toBe(StatusCodes.BAD_REQUEST);
     });
 
     it('should return 404 if id is invalid', async () => {
@@ -338,7 +345,7 @@ describe('/api/apps', () => {
 
       const res = await exec();
 
-      expect(res.status).toBe(404);
+      expect(res.status).toBe(StatusCodes.NOT_FOUND);
     });
 
     it('should return 404 if app with the given id was not found', async () => {
@@ -346,20 +353,21 @@ describe('/api/apps', () => {
 
       const res = await exec();
 
-      expect(res.status).toBe(404);
+      expect(res.status).toBe(StatusCodes.NOT_FOUND);
     });
 
     it('should update the app if input is valid', async () => {
-      await exec();
-
+      const res = await exec();
       const updatedApp = await Application.findById(app.id);
 
+      expect(res.status).toBe(StatusCodes.OK);
       expect(updatedApp.name).toBe(newName);
     });
 
     it('should return the updated app if it is valid', async () => {
       const res = await exec();
 
+      expect(res.status).toBe(StatusCodes.OK);
       expect(res.body).toHaveProperty('id');
       expect(res.body).toHaveProperty('name', newName);
     });
