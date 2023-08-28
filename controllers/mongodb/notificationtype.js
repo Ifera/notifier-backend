@@ -156,12 +156,6 @@ async function deleteNotificationTypesByEventID(id) {
   );
 }
 
-async function isNotificationTypeActive(id) {
-  const res = await getNotificationTypeByID(id);
-
-  return !res ? false : res.is_active && !res.is_deleted;
-}
-
 module.exports = {
   createNotificationType,
   getNotificationTypeByID,
@@ -170,5 +164,4 @@ module.exports = {
   deleteNotificationType,
   deleteNotificationTypes,
   deleteNotificationTypesByEventID,
-  isNotificationTypeActive,
 };

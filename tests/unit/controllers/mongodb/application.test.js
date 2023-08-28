@@ -263,41 +263,4 @@ describe('MongoDB Application Controller', () => {
       );
     });
   });
-
-  // Test isAppActive function
-  describe('isAppActive', () => {
-    it('should return true if the application is active', async () => {
-      Application.findOne = jest.fn(() => ({
-        _id: 'testAppId',
-        name: 'Test App',
-        is_active: true,
-        is_deleted: false,
-      }));
-
-      const isActive = await isAppActive('testAppId');
-
-      expect(isActive).toBe(true);
-    });
-
-    it('should return false if the application is not active', async () => {
-      Application.findOne = jest.fn(() => ({
-        _id: 'testAppId',
-        name: 'Test App',
-        is_active: false,
-        is_deleted: false,
-      }));
-
-      const isActive = await isAppActive('testAppId');
-
-      expect(isActive).toBe(false);
-    });
-
-    it('should return false if the application with the given ID does not exist', async () => {
-      Application.findOne = jest.fn(() => null);
-
-      const isActive = await isAppActive('nonExistentId');
-
-      expect(isActive).toBe(false);
-    });
-  });
 });

@@ -160,12 +160,6 @@ async function deleteApps(ids) {
   return apps;
 }
 
-async function isAppActive(id) {
-  const res = await getAppByID(id);
-
-  return !res ? false : res.is_active && !res.is_deleted;
-}
-
 module.exports = {
   createApp,
   getAppByID,
@@ -173,5 +167,4 @@ module.exports = {
   updateApp,
   deleteApp,
   deleteApps,
-  isAppActive,
 };

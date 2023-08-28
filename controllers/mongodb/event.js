@@ -164,12 +164,6 @@ async function deleteEventsByAppID(id) {
   );
 }
 
-async function isEventActive(id) {
-  const res = await getEventByID(id);
-
-  return !res ? false : res.is_active && !res.is_deleted;
-}
-
 module.exports = {
   createEvent,
   getEventByID,
@@ -178,5 +172,4 @@ module.exports = {
   deleteEvent,
   deleteEvents,
   deleteEventsByAppID,
-  isEventActive,
 };
