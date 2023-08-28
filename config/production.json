@@ -1,4 +1,5 @@
 {
+  "env": "production",
   "port": 3000,
 
   "log": {

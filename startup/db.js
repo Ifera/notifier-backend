@@ -2,18 +2,18 @@ const mongoose = require('mongoose');
 const winston = require('winston');
 const config = require('config');
 
-const { USE_MONGO_DB } = require('../globals');
+const { USE_MONGO_DB, IS_TEST_ENV } = require('../globals');
 
 module.exports = function () {
   winston.debug('init db');
 
-  if (USE_MONGO_DB) {
+  if (IS_TEST_ENV || USE_MONGO_DB) {
     winston.info('Using MongoDB');
 
     const uri = config.get('db.mongodb.uri');
     mongoose.connect(uri).then(() => winston.info('Connected to MongoDB...'));
 
-    return;
+    if (!IS_TEST_ENV) return;
   }
 
   winston.debug('Using Knex (postgres)');

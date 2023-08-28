@@ -1,4 +1,5 @@
 const request = require('supertest');
+const config = require('config');
 const mongoose = require('mongoose');
 const { Application } = require('../../../models/application');
 
@@ -300,7 +301,7 @@ describe('/api/apps', () => {
     });
   });
 
-  describe('PUT /:id', () => {
+  describe('PATCH /:id', () => {
     let newName;
     let app;
     let id;

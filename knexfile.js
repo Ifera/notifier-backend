@@ -21,4 +21,5 @@ const data = {
 module.exports = {
   development: { ...data },
   production: { ...data },
+  test: { ...data },
 };
