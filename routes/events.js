@@ -64,8 +64,7 @@ router.delete('/', validateBulkDelete, async (req, res) => {
 router.delete('/:id', validateObjectId, async (req, res) => {
   const result = await deleteEvent(req.params.id);
 
-  if (!result)
-    throw new BadRequest('The event with the given ID was not found.');
+  if (!result) throw new NotFound('The event with the given ID was not found.');
 
   return res.send('Success');
 });
