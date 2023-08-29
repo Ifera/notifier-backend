@@ -20,11 +20,21 @@ describe('validateQP function', () => {
     expect(result.error).toBeUndefined();
   });
 
-  it('should fail validation for invalid query parameters', () => {
+  it('should fail for invalid query parameters', () => {
     // Invalid pageNumber (negative value)
     const req = {
       like: 'Test',
       pageNumber: -1,
+    };
+
+    const result = validateQP(req);
+
+    expect(result.error).toBeDefined();
+  });
+
+  it('should fail if unknown query parameters are passed', () => {
+    const req = {
+      unknown: 'unknown',
     };
 
     const result = validateQP(req);
@@ -47,9 +57,30 @@ describe('validatePost function', () => {
     expect(result.error).toBeUndefined();
   });
 
-  it('should fail validation for invalid POST request data', () => {
+  it('should fail if name is less than 3 characters', () => {
     const req = {
       name: 'A', // Invalid name (too short)
+    };
+
+    const result = validatePost(req);
+
+    expect(result.error).toBeDefined();
+  });
+
+  it('should fail if name is more than 50 characters', () => {
+    const req = {
+      name: new Array(52).join('a'),
+    };
+
+    const result = validatePost(req);
+
+    expect(result.error).toBeDefined();
+  });
+
+  it('should fail if description is more than 255 characters', () => {
+    const req = {
+      name: 'Test App',
+      description: new Array(257).join('a'),
     };
 
     const result = validatePost(req);
@@ -73,9 +104,22 @@ describe('validate function', () => {
     });
   });
 
-  it('should fail validation for invalid request data', () => {
+  it('should fail for invalid request data', () => {
     const req = {
       name: 'A', // Invalid name (too short)
+    };
+
+    const result = validate(req);
+
+    expect(result.error).toBeDefined();
+  });
+
+  it('should fail if unknown properties are passed', () => {
+    const req = {
+      name: 'Test App',
+      description: 'This is a test application',
+      is_active: true,
+      unknown: 'unknown',
     };
 
     const result = validate(req);

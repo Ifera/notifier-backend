@@ -2,13 +2,15 @@ const request = require('supertest');
 const { StatusCodes } = require('http-status-codes');
 
 const mongoose = require('mongoose');
-const { Application } = require('../../../models/application');
+const { Application } = require('../../../../models/application');
+const { Event } = require('../../../../models/event');
+const { NotificationType } = require('../../../../models/notificationtype');
 
 let server;
 
 describe('/api/apps', () => {
   beforeEach(() => {
-    server = require('../../../main');
+    server = require('../../../../main');
   });
 
   afterEach(async () => {
@@ -17,12 +19,6 @@ describe('/api/apps', () => {
   });
 
   describe('GET /', () => {
-    it('should return 400 if invalid query parameters are passed', async () => {
-      const res = await request(server).get('/api/apps/?sortBy=id&sortOrder=0');
-
-      expect(res.status).toBe(StatusCodes.BAD_REQUEST);
-    });
-
     it('should return all apps', async () => {
       const apps = [
         new Application({
@@ -219,30 +215,6 @@ describe('/api/apps', () => {
       name = 'app';
     });
 
-    it('should return 400 if app name is less than 3 characters', async () => {
-      name = 'ap';
-
-      const res = await exec();
-
-      expect(res.status).toBe(StatusCodes.BAD_REQUEST);
-    });
-
-    it('should return 400 if name is more than 50 characters', async () => {
-      name = new Array(52).join('a');
-
-      const res = await exec();
-
-      expect(res.status).toBe(StatusCodes.BAD_REQUEST);
-    });
-
-    it('should return 400 if invalid property is passed in body', async () => {
-      const res = await request(server)
-        .post('/api/apps')
-        .send({ name: 'app', invalid: 'invalid' });
-
-      expect(res.status).toBe(StatusCodes.BAD_REQUEST);
-    });
-
     it('should return 409 if app with the same name already exists', async () => {
       const app = new Application({ name: 'app' });
       await app.save();
@@ -252,7 +224,7 @@ describe('/api/apps', () => {
       expect(res.status).toBe(StatusCodes.CONFLICT);
     });
 
-    it('should save the app if it is valid', async () => {
+    it('should save the app if request is valid', async () => {
       const res = await exec();
       const app = await Application.find({ name: 'app' });
 
@@ -282,6 +254,11 @@ describe('/api/apps', () => {
       id = app._id;
     });
 
+    afterEach(async () => {
+      await Event.deleteMany({});
+      await NotificationType.deleteMany({});
+    });
+
     it('should return 404 if id is invalid', async () => {
       id = 1;
 
@@ -298,13 +275,94 @@ describe('/api/apps', () => {
       expect(res.status).toBe(StatusCodes.NOT_FOUND);
     });
 
-    it('should delete the app if input is valid', async () => {
+    it('should delete the app', async () => {
       const res = await exec();
       const res2 = await Application.findById(id);
 
       expect(res.status).toBe(StatusCodes.OK);
       expect(res2.is_deleted).toBeTruthy();
       expect(res2.is_active).toBeFalsy();
+    });
+
+    it('should delete the app and its associated event(s)', async () => {
+      const events = [
+        new Event({
+          name: 'event1',
+          description: 'event1',
+          is_active: true,
+          application: id,
+        }),
+        new Event({
+          name: 'event2',
+          description: 'event2',
+          is_active: true,
+          application: id,
+        }),
+      ];
+
+      await Event.collection.insertMany(events);
+
+      const res1 = await exec();
+      const res2 = await Application.findById(id);
+      const res3 = await Event.find({ application: id });
+
+      expect(res1.status).toBe(StatusCodes.OK);
+
+      expect(res2.is_deleted).toBeTruthy();
+      expect(res2.is_active).toBeFalsy();
+
+      expect(res3.length).toBe(2);
+      expect(res3[0].is_deleted).toBeTruthy();
+      expect(res3[0].is_active).toBeFalsy();
+      expect(res3[1].is_deleted).toBeTruthy();
+      expect(res3[1].is_active).toBeFalsy();
+    });
+
+    it('should delete the app and its associated notification-type(s)', async () => {
+      const ev = new Event({
+        name: 'event1',
+        description: 'event1',
+        is_active: true,
+        application: id,
+      });
+
+      const event = await ev.save();
+
+      const notificationTypes = [
+        new NotificationType({
+          name: 'notificationType1',
+          description: 'notificationType1',
+          is_active: true,
+          event: event._id,
+        }),
+        new NotificationType({
+          name: 'notificationType2',
+          description: 'notificationType2',
+          is_active: true,
+          event: event._id,
+        }),
+      ];
+
+      await NotificationType.collection.insertMany(notificationTypes);
+
+      const res1 = await exec();
+      const res2 = await Application.findById(id);
+      const res3 = await Event.findById(event._id);
+      const res4 = await NotificationType.find({ event: event._id });
+
+      expect(res1.status).toBe(StatusCodes.OK);
+
+      expect(res2.is_deleted).toBeTruthy();
+      expect(res2.is_active).toBeFalsy();
+
+      expect(res3.is_deleted).toBeTruthy();
+      expect(res3.is_active).toBeFalsy();
+
+      expect(res4.length).toBe(2);
+      expect(res4[0].is_deleted).toBeTruthy();
+      expect(res4[0].is_active).toBeFalsy();
+      expect(res4[1].is_deleted).toBeTruthy();
+      expect(res4[1].is_active).toBeFalsy();
     });
   });
 
@@ -322,30 +380,6 @@ describe('/api/apps', () => {
 
       id = app._id;
       newName = 'updatedName';
-    });
-
-    it('should return 400 if app name is less than 3 characters', async () => {
-      newName = 'ap';
-
-      const res = await exec();
-
-      expect(res.status).toBe(StatusCodes.BAD_REQUEST);
-    });
-
-    it('should return 400 if app name is more than 50 characters', async () => {
-      newName = new Array(52).join('a');
-
-      const res = await exec();
-
-      expect(res.status).toBe(StatusCodes.BAD_REQUEST);
-    });
-
-    it('should return 404 if id is invalid', async () => {
-      id = 1;
-
-      const res = await exec();
-
-      expect(res.status).toBe(StatusCodes.NOT_FOUND);
     });
 
     it('should return 404 if app with the given id was not found', async () => {
@@ -370,6 +404,15 @@ describe('/api/apps', () => {
       expect(res.status).toBe(StatusCodes.OK);
       expect(res.body).toHaveProperty('id');
       expect(res.body).toHaveProperty('name', newName);
+    });
+
+    it('should update the modified date on successful update', async () => {
+      const oldDate = app.modified_at;
+      const res = await exec();
+      const newDate = res.body.modified_at;
+
+      expect(res.status).toBe(StatusCodes.OK);
+      expect(newDate).not.toBe(oldDate);
     });
   });
 });

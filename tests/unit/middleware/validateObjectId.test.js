@@ -43,7 +43,6 @@ describe('validateObjectId middleware', () => {
   });
 
   it('should return 404 and send "Invalid ID." when the ObjectId is invalid', () => {
-    USE_MONGO_DB = true; // eslint-disable-line
     mongoose.Types.ObjectId.isValid.mockReturnValue(false);
 
     validateObjectId(req, res, next);

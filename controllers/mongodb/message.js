@@ -3,7 +3,7 @@ const { Message } = require('../../models/message');
 const { getAppByID } = require('./application');
 const { getEventByID } = require('./event');
 const { getNotificationTypeByID } = require('./notificationtype');
-const { BadRequest } = require('../../utils/error');
+const { BadRequest, NotFound } = require('../../utils/error');
 
 async function createMessage(req) {
   // first check if notification type is provided
@@ -16,7 +16,7 @@ async function createMessage(req) {
   const notif = await getNotificationTypeByID(req.notification_type);
 
   if (!notif)
-    throw new BadRequest(
+    throw new NotFound(
       'The notification type with the given ID was not found.',
     );
 
