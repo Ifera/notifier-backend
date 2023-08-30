@@ -65,9 +65,9 @@ router.get('/:id', validateObjectId, async (req, res) => {
 router.post('/', validateReq(validatePost), async (req, res) => {
   // extract tags from the body and set it with the request body
   req.body.tags = extractTags(req.body.template_body);
-  const event = await createNotificationType(req.body);
+  const nt = await createNotificationType(req.body);
 
-  return res.send(_.pick(event, filteredProps));
+  return res.send(_.pick(nt, filteredProps));
 });
 
 router.delete('/', validateBulkDelete, async (req, res) => {

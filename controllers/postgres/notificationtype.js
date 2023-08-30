@@ -33,7 +33,8 @@ async function createNotificationType(req) {
 
   // do this after creating the notification type
   // so that in case of error, the tags are not upserted
-  if (ret && req.tags) {
+
+  if (ret && req.tags.length > 0) {
     await upsertTags(req.tags);
   }
 
@@ -173,7 +174,7 @@ async function updateNotificationType(id, req) {
 
   // do this after updating the notification type
   // so that in case of error, the tags are not upserted
-  if (ret && req.tags) {
+  if (ret && req.tags?.length > 0) {
     await upsertTags(req.tags);
   }
 
@@ -181,7 +182,7 @@ async function updateNotificationType(id, req) {
 }
 
 async function deleteNotificationType(id) {
-  return updateNotificationType((id, { is_active: false, is_deleted: true }));
+  return updateNotificationType(id, { is_active: false, is_deleted: true });
 }
 
 async function deleteNotificationTypes(ids) {
