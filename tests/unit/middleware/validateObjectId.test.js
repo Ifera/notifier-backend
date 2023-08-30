@@ -1,16 +1,6 @@
-const mongoose = require('mongoose');
+const { StatusCodes } = require('http-status-codes');
 const validateObjectId = require('../../../middleware/validateObjectId');
-
-const { USE_MONGO_DB, itif } = require('../../../globals');
-
-// Mocking mongoose and globals
-jest.mock('mongoose', () => ({
-  Types: {
-    ObjectId: {
-      isValid: jest.fn(),
-    },
-  },
-}));
+const { USE_MONGO_DB } = require('../../../globals');
 
 describe('validateObjectId middleware', () => {
   let req;
@@ -20,7 +10,7 @@ describe('validateObjectId middleware', () => {
   beforeEach(() => {
     req = {
       params: {
-        id: 'validObjectId',
+        id: USE_MONGO_DB ? '123456789012345678901234' : 1,
       },
     };
     res = {
@@ -34,9 +24,7 @@ describe('validateObjectId middleware', () => {
     jest.clearAllMocks();
   });
 
-  it('should call next when and ObjectId is valid', () => {
-    mongoose.Types.ObjectId.isValid.mockReturnValue(true);
-
+  it('should call next when ObjectId is valid', () => {
     validateObjectId(req, res, next);
 
     expect(next).toHaveBeenCalledTimes(1);
@@ -44,16 +32,13 @@ describe('validateObjectId middleware', () => {
     expect(res.send).not.toHaveBeenCalled();
   });
 
-  itif(USE_MONGO_DB)(
-    'should return 404 and send "Invalid ID." when the ObjectId is invalid',
-    () => {
-      mongoose.Types.ObjectId.isValid.mockReturnValue(false);
+  it('should return 404 and send "Invalid ID." when the ObjectId is invalid', () => {
+    req.params.id = 'invalidId';
 
-      validateObjectId(req, res, next);
+    validateObjectId(req, res, next);
 
-      expect(next).not.toHaveBeenCalled();
-      expect(res.status).toHaveBeenCalledWith(404);
-      expect(res.send).toHaveBeenCalledWith('Invalid ID.');
-    },
-  );
+    expect(next).not.toHaveBeenCalled();
+    expect(res.status).toHaveBeenCalledWith(StatusCodes.NOT_FOUND);
+    expect(res.send).toHaveBeenCalledWith('Invalid ID.');
+  });
 });
