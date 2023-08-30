@@ -8,6 +8,8 @@ const {
   extractTags,
 } = require('../../../models/notificationtype');
 
+const { USE_MONGO_DB } = require('../../../globals');
+
 describe('validateQP function', () => {
   it('should validate query parameters successfully', () => {
     const req = {
@@ -17,7 +19,7 @@ describe('validateQP function', () => {
       isActive: true,
       sortOrder: 1,
       sortBy: 'name',
-      event: '123456789012345678901234', // A valid MongoDB ObjectId
+      event: USE_MONGO_DB ? '123456789012345678901234' : 1,
     };
 
     const result = validateQP(req);
@@ -51,7 +53,7 @@ describe('validatePost function', () => {
       template_subject: 'Subject',
       template_body: 'Template Body',
       is_active: true,
-      event: '123456789012345678901234', // A valid MongoDB ObjectId
+      event: USE_MONGO_DB ? '123456789012345678901234' : 1, // A valid MongoDB ObjectId
     };
 
     const result = validatePost(req);

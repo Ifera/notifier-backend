@@ -3,6 +3,8 @@ require('../../../startup/validation')();
 
 const { validatePost } = require('../../../models/message');
 
+const { USE_MONGO_DB } = require('../../../globals');
+
 describe('validatePost function', () => {
   it('should validate POST request data successfully', () => {
     const req = {
@@ -10,7 +12,7 @@ describe('validatePost function', () => {
       metadata: {
         key: 'value',
       },
-      notification_type: '123456789012345678901234', // A valid MongoDB ObjectId
+      notification_type: USE_MONGO_DB ? '123456789012345678901234' : 1,
     };
 
     const result = validatePost(req);
@@ -25,7 +27,7 @@ describe('validatePost function', () => {
       metadata: {
         key: 'value',
       },
-      notification_type: '123456789012345678901234', // A valid MongoDB ObjectId
+      notification_type: USE_MONGO_DB ? '123456789012345678901234' : 1,
     };
 
     const result = validatePost(req);
@@ -37,7 +39,7 @@ describe('validatePost function', () => {
     const req = {
       email: 'test@example.com',
       // metadata is missing
-      notification_type: '123456789012345678901234', // A valid MongoDB ObjectId
+      notification_type: USE_MONGO_DB ? '123456789012345678901234' : 1,
     };
 
     const result = validatePost(req);

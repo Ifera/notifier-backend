@@ -3,6 +3,8 @@ require('../../../startup/validation')();
 
 const { validateQP, validatePost, validate } = require('../../../models/event');
 
+const { USE_MONGO_DB } = require('../../../globals');
+
 describe('validateQP function', () => {
   it('should validate query parameters successfully', () => {
     const req = {
@@ -12,7 +14,7 @@ describe('validateQP function', () => {
       isActive: true,
       sortOrder: 1,
       sortBy: 'name',
-      application: '123456789012345678901234', // A valid MongoDB ObjectId
+      application: USE_MONGO_DB ? '123456789012345678901234' : 1, // A valid MongoDB ObjectId
     };
 
     const result = validateQP(req);
@@ -44,7 +46,7 @@ describe('validatePost function', () => {
       name: 'Test Event',
       description: 'This is a test event',
       is_active: true,
-      application: '123456789012345678901234', // A valid MongoDB ObjectId
+      application: USE_MONGO_DB ? '123456789012345678901234' : 1, // A valid MongoDB ObjectId
     };
 
     const result = validatePost(req);
