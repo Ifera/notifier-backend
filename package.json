@@ -9,7 +9,8 @@
     "prod": "clear && NODE_ENV=production node main.js",
     "dev": "clear && NODE_ENV=development nodemon main.js",
     "test:mongo": "clear && NODE_ENV=test NOTIFIER_DB_TYPE=mongodb jest --watchAll --verbose --detectOpenHandles --testPathIgnorePatterns postgres",
-    "test:postgres": "clear && NODE_ENV=test NOTIFIER_DB_TYPE=postgres jest --watchAll --verbose --detectOpenHandles --testPathIgnorePatterns mongo"
+    "test:postgres": "clear && NODE_ENV=test NOTIFIER_DB_TYPE=postgres jest --watchAll --verbose --detectOpenHandles --testPathIgnorePatterns mongo",
+    "test": "clear && NODE_ENV=test jest --watchAll --verbose --detectOpenHandles"
   },
   "keywords": [],
   "author": "",
