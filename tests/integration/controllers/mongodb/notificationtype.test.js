@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 const { Application } = require('../../../../models/application');
 const { Event } = require('../../../../models/event');
 const { NotificationType } = require('../../../../models/notificationtype');
+const Tag = require('../../../../models/tag');
 
 let server;
 let app;
@@ -41,6 +42,7 @@ describe('/api/notificationtypes', () => {
     await Application.deleteMany({});
     await Event.deleteMany({});
     await NotificationType.deleteMany({});
+    await Tag.deleteMany({});
   });
 
   describe('GET /', () => {
@@ -277,7 +279,7 @@ describe('/api/notificationtypes', () => {
       request(server).post('/api/notification-types').send({
         name,
         template_subject: 'notif subj',
-        template_body: 'notif body',
+        template_body: 'notif body {name} {date}',
         event: eventId,
       });
 
@@ -300,20 +302,20 @@ describe('/api/notificationtypes', () => {
       expect(res.status).toBe(StatusCodes.CONFLICT);
     });
 
-    it('should save the notification type if request is valid', async () => {
+    it('should return the notification type and upsert the tags', async () => {
       const res = await exec();
-      const notif = await NotificationType.find({ name });
+      const notif = await NotificationType.findOne({ name });
+      const tags = await Tag.find({});
 
       expect(res.status).toBe(StatusCodes.OK);
       expect(notif).not.toBeNull();
-    });
+      expect(notif).toHaveProperty('id');
+      expect(notif).toHaveProperty('name', name);
+      expect(notif.tags).toEqual(['name', 'date']);
 
-    it('should return the notification type if it is valid', async () => {
-      const res = await exec();
-
-      expect(res.status).toBe(StatusCodes.OK);
-      expect(res.body).toHaveProperty('id');
-      expect(res.body).toHaveProperty('name', name);
+      expect(tags.length).toBe(2);
+      expect(tags.some((a) => a.label === 'name')).toBeTruthy();
+      expect(tags.some((a) => a.label === 'date')).toBeTruthy();
     });
   });
 
@@ -364,6 +366,56 @@ describe('/api/notificationtypes', () => {
       expect(res1.status).toBe(StatusCodes.OK);
       expect(res2.is_deleted).toBeTruthy();
       expect(res2.is_active).toBeFalsy();
+    });
+  });
+
+  describe('DELETE /', () => {
+    let notifs;
+    let ids;
+
+    const exec = async () =>
+      request(server).delete(`/api/notification-types/`).send({ ids });
+
+    beforeEach(async () => {
+      notifs = [
+        new NotificationType({
+          name: 'notif1',
+          template_subject: 'notif1 subj',
+          template_body: 'notif1 body',
+          is_active: true,
+          event: eventId,
+        }),
+        new NotificationType({
+          name: 'notif2',
+          template_subject: 'notif2 subj',
+          template_body: 'notif2 body',
+          is_active: true,
+          event: eventId,
+        }),
+      ];
+
+      notifs = await NotificationType.collection.insertMany(notifs);
+      ids = Object.values(notifs.insertedIds);
+    });
+
+    it('should return 404 if no notification types with the given ids were found', async () => {
+      ids = [new mongoose.Types.ObjectId(), new mongoose.Types.ObjectId()];
+
+      const res = await exec();
+
+      expect(res.status).toBe(StatusCodes.NOT_FOUND);
+    });
+
+    it('should delete the notification types', async () => {
+      const res = await exec();
+      const res2 = await NotificationType.find({ _id: { $in: ids } });
+
+      expect(res.status).toBe(StatusCodes.OK);
+      expect(res2.length).toBe(2);
+      expect(res2[0].is_deleted).toBeTruthy();
+      expect(res2[0].is_active).toBeFalsy();
+      expect(res2[1].is_deleted).toBeTruthy();
+      expect(res2[1].is_active).toBeFalsy();
     });
   });
 
@@ -422,6 +474,26 @@ describe('/api/notificationtypes', () => {
 
       expect(res.status).toBe(StatusCodes.OK);
       expect(newDate).not.toBe(oldDate);
+    });
+
+    it('should return 409 if notification type with the same name already exists', async () => {
+      const notif2 = new NotificationType({
+        name: 'notif2',
+        template_subject: 'notif2 subj',
+        template_body: 'notif2 body',
+        is_active: true,
+        event: eventId,
+      });
+      await notif2.save();
+
+      newName = 'notif';
+      id = notif2.id;
+
+      const res = await exec();
+
+      // console.log(res);
+
+      expect(res.status).toBe(StatusCodes.CONFLICT);
     });
   });
 });
