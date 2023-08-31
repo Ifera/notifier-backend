@@ -456,6 +456,26 @@ describe('/api/notificationtypes', () => {
       expect(res.status).toBe(StatusCodes.NOT_FOUND);
     });
 
+    it('should return 409 if notification type with the same name already exists', async () => {
+      let notif2 = {
+        name: 'notif2',
+        template_subject: 'notif2 subj',
+        template_body: 'notif2 body',
+        is_active: true,
+        event: eventId,
+      };
+
+      notif2 = await knex('notificationtypes').insert(notif2).returning('*');
+      notif2 = notif2[0]; // eslint-disable-line
+
+      newName = 'notif';
+      id = notif2.id;
+
+      const res = await exec();
+
+      expect(res.status).toBe(StatusCodes.CONFLICT);
+    });
+
     it('should update the notification type if input is valid', async () => {
       const res = await exec();
       const updated = await knex('notificationtypes').where({ id }).first();

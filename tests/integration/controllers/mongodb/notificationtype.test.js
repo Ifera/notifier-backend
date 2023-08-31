@@ -451,6 +451,24 @@ describe('/api/notificationtypes', () => {
       expect(res.status).toBe(StatusCodes.NOT_FOUND);
     });
 
+    it('should return 409 if notification type with the same name already exists', async () => {
+      const notif2 = new NotificationType({
+        name: 'notif2',
+        template_subject: 'notif2 subj',
+        template_body: 'notif2 body',
+        is_active: true,
+        event: eventId,
+      });
+      await notif2.save();
+
+      newName = 'notif';
+      id = notif2.id;
+
+      const res = await exec();
+
+      expect(res.status).toBe(StatusCodes.CONFLICT);
+    });
+
     it('should update the notification type if input is valid', async () => {
       const res = await exec();
       const updated = await NotificationType.findById(id);
@@ -474,26 +492,6 @@ describe('/api/notificationtypes', () => {
 
       expect(res.status).toBe(StatusCodes.OK);
       expect(newDate).not.toBe(oldDate);
-    });
-
-    it('should return 409 if notification type with the same name already exists', async () => {
-      const notif2 = new NotificationType({
-        name: 'notif2',
-        template_subject: 'notif2 subj',
-        template_body: 'notif2 body',
-        is_active: true,
-        event: eventId,
-      });
-      await notif2.save();
-
-      newName = 'notif';
-      id = notif2.id;
-
-      const res = await exec();
-
-      // console.log(res);
-
-      expect(res.status).toBe(StatusCodes.CONFLICT);
     });
   });
 });
