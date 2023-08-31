@@ -143,17 +143,12 @@ async function deleteNotificationType(id) {
 }
 
 async function deleteNotificationTypes(ids) {
-  return NotificationType.updateMany(
+  const res = await NotificationType.updateMany(
     { _id: { $in: ids } },
     { is_active: false, is_deleted: true },
   );
-}
 
-async function deleteNotificationTypesByEventID(id) {
-  return NotificationType.updateMany(
-    { event: id },
-    { is_active: false, is_deleted: true },
-  );
+  return res.modifiedCount > 0;
 }
 
 module.exports = {
@@ -163,5 +158,4 @@ module.exports = {
   updateNotificationType,
   deleteNotificationType,
   deleteNotificationTypes,
-  deleteNotificationTypesByEventID,
 };

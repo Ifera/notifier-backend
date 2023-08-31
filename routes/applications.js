@@ -55,7 +55,7 @@ router.post('/', validateReq(validatePost), async (req, res) => {
 router.delete('/', validateBulkDelete, async (req, res) => {
   const result = await deleteApps(req.body.ids);
 
-  if (result.length === 0) throw new NotFound('Nothing to delete.');
+  if (!result || result.length === 0) throw new NotFound('Nothing to delete.');
 
   return res.send('Success');
 });

@@ -73,7 +73,7 @@ router.post('/', validateReq(validatePost), async (req, res) => {
 router.delete('/', validateBulkDelete, async (req, res) => {
   const result = await deleteNotificationTypes(req.body.ids);
 
-  if (result.length === 0) throw new NotFound('Nothing to delete.');
+  if (!result || result.length === 0) throw new NotFound('Nothing to delete.');
 
   return res.send('Success');
 });
@@ -101,14 +101,14 @@ router.patch(
       req.body.tags = extractTags(req.body.template_body);
     }
 
-    const event = await updateNotificationType(req.params.id, req.body);
+    const notif = await updateNotificationType(req.params.id, req.body);
 
-    if (!event)
+    if (!notif)
       throw new NotFound(
         'The notification type with the given ID was not found.',
       );
 
-    return res.send(_.pick(event, filteredProps));
+    return res.send(_.pick(notif, filteredProps));
   },
 );
 

@@ -138,7 +138,7 @@ async function deleteApps(ids) {
     { $set: { is_active: false, is_deleted: true } },
   );
 
-  if (!apps) return false;
+  if (apps.modifiedCount <= 0) return false;
 
   // delete all events associated with this app
   await Event.updateMany(
