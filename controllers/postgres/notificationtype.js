@@ -167,6 +167,24 @@ async function updateNotificationType(id, req) {
   const _req = { ...req };
   if (_req.tags) _req.tags = _req.tags.join(';');
 
+  // check if notification type with the same name and event id exists
+  // the event id is checked by ignoring the current notification type
+  if (req.name) {
+    const notifExists = await knex('notificationtypes')
+      .select('*')
+      .where({
+        name: req.name,
+        is_deleted: false,
+      })
+      .whereNot({ id });
+
+    if (notifExists.length > 0) {
+      throw new ConflictError(
+        'Notification type with the same name and event ID already exists',
+      );
+    }
+  }
+
   const ret = await knex('notificationtypes')
     .update(_req)
     .where({ id })
