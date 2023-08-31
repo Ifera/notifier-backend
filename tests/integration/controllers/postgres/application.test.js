@@ -374,6 +374,49 @@ describe('/api/apps', () => {
     });
   });
 
+  describe('DELETE /', () => {
+    let apps;
+    let ids;
+
+    const exec = async () => request(server).delete(`/api/apps/`).send({ ids });
+
+    beforeEach(async () => {
+      apps = [
+        {
+          name: 'app1',
+          is_active: true,
+        },
+        {
+          name: 'app2',
+          is_active: true,
+        },
+      ];
+
+      apps = await knex('applications').insert(apps).returning('*');
+      ids = apps.map((a) => a.id);
+    });
+
+    it('should return 404 if no apps with the given ids were found', async () => {
+      ids = [101, 102];
+
+      const res = await exec();
+
+      expect(res.status).toBe(StatusCodes.NOT_FOUND);
+    });
+
+    it('should delete the apps', async () => {
+      const res = await exec();
+      const res2 = await knex('applications').whereIn('id', ids);
+
+      expect(res.status).toBe(StatusCodes.OK);
+      expect(res2.length).toBe(2);
+      expect(res2[0].is_deleted).toBeTruthy();
+      expect(res2[0].is_active).toBeFalsy();
+      expect(res2[1].is_deleted).toBeTruthy();
+      expect(res2[1].is_active).toBeFalsy();
+    });
+  });
+
   describe('PATCH /:id', () => {
     let newName;
     let app;

@@ -345,6 +345,52 @@ describe('/api/events', () => {
     });
   });
 
+  describe('DELETE /', () => {
+    let events;
+    let ids;
+
+    const exec = async () =>
+      request(server).delete(`/api/events/`).send({ ids });
+
+    beforeEach(async () => {
+      events = [
+        {
+          name: 'event1',
+          is_active: true,
+          application: appId,
+        },
+        {
+          name: 'event2',
+          is_active: true,
+          application: appId,
+        },
+      ];
+
+      events = await knex('events').insert(events).returning('*');
+      ids = events.map((e) => e.id);
+    });
+
+    it('should return 404 if no events with the given ids were found', async () => {
+      ids = [101, 102];
+
+      const res = await exec();
+
+      expect(res.status).toBe(StatusCodes.NOT_FOUND);
+    });
+
+    it('should delete the events', async () => {
+      const res = await exec();
+      const res2 = await knex('events').whereIn('id', ids);
+
+      expect(res.status).toBe(StatusCodes.OK);
+      expect(res2.length).toBe(2);
+      expect(res2[0].is_deleted).toBeTruthy();
+      expect(res2[0].is_active).toBeFalsy();
+      expect(res2[1].is_deleted).toBeTruthy();
+      expect(res2[1].is_active).toBeFalsy();
+    });
+  });
+
   describe('PATCH /:id', () => {
     let newName;
     let event;
