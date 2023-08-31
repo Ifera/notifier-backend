@@ -284,7 +284,7 @@ describe('/api/notificationtypes', () => {
       request(server).post('/api/notification-types').send({
         name,
         template_subject: 'notif subj',
-        template_body: 'notif body',
+        template_body: 'notif body {{name}} {{date}}',
         event: eventId,
       });
 
@@ -307,14 +307,20 @@ describe('/api/notificationtypes', () => {
       expect(res.status).toBe(StatusCodes.CONFLICT);
     });
 
-    it('should save and return the notification type if request is valid', async () => {
+    it('should save the notification type and upsert the tags', async () => {
       const res = await exec();
       const notif = await knex('notificationtypes').where({ name }).first();
+      const tags = await knex('tags');
 
       expect(res.status).toBe(StatusCodes.OK);
       expect(notif).not.toBeNull();
-      expect(res.body).toHaveProperty('id');
-      expect(res.body).toHaveProperty('name', name);
+      expect(notif).toHaveProperty('id');
+      expect(notif).toHaveProperty('name', name);
+      expect(notif.tags).toEqual('name;date'); // in postgres, tags are saved as a string separated by ;
+
+      expect(tags.length).toBe(2);
+      expect(tags.some((t) => t.label === 'name')).toBeTruthy();
+      expect(tags.some((t) => t.label === 'date')).toBeTruthy();
     });
   });
 
@@ -363,6 +369,56 @@ describe('/api/notificationtypes', () => {
       expect(res1.status).toBe(StatusCodes.OK);
       expect(res2.is_deleted).toBeTruthy();
       expect(res2.is_active).toBeFalsy();
+    });
+  });
+
+  describe('DELETE /', () => {
+    let notifs;
+    let ids;
+
+    const exec = async () =>
+      request(server).delete(`/api/notification-types/`).send({ ids });
+
+    beforeEach(async () => {
+      notifs = [
+        {
+          name: 'notif1',
+          template_subject: 'notif1 subj',
+          template_body: 'notif1 body',
+          is_active: true,
+          event: eventId,
+        },
+        {
+          name: 'notif2',
+          template_subject: 'notif2 subj',
+          template_body: 'notif2 body',
+          is_active: true,
+          event: eventId,
+        },
+      ];
+
+      notifs = await knex('notificationtypes').insert(notifs).returning('*');
+      ids = notifs.map((n) => n.id);
+    });
+
+    it('should return 404 if no notification types with the given ids were found', async () => {
+      ids = [101, 102];
+
+      const res = await exec();
+
+      expect(res.status).toBe(StatusCodes.NOT_FOUND);
+    });
+
+    it('should delete the notification types', async () => {
+      const res = await exec();
+      const res2 = await knex('notificationtypes').whereIn('id', ids);
+
+      expect(res.status).toBe(StatusCodes.OK);
+      expect(res2.length).toBe(2);
+      expect(res2[0].is_deleted).toBeTruthy();
+      expect(res2[0].is_active).toBeFalsy();
+      expect(res2[1].is_deleted).toBeTruthy();
+      expect(res2[1].is_active).toBeFalsy();
     });
   });
 
