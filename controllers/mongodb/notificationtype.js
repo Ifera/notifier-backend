@@ -126,6 +126,20 @@ async function updateNotificationType(id, obj) {
   const notif = await getNotificationTypeByID(id);
   if (!notif) return false;
 
+  // check if notification type with same name and event id already exists
+  if (obj.name && obj.name !== notif.name) {
+    const notifExists = await NotificationType.findOne({
+      name: obj.name,
+      event: notif.event,
+      is_deleted: false,
+    });
+
+    if (notifExists)
+      throw new ConflictError(
+        'Notification type with the same name and event ID already exists',
+      );
+  }
+
   Object.assign(notif, obj);
   notif.modified_at = Date.now();
 
