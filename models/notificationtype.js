@@ -95,7 +95,7 @@ function validate(req) {
 }
 
 function extractTags(str) {
-  const tagPattern = /{{(.*?)}}/g;
+  const tagPattern = /{(.*?)}/g;
   const tags = [];
   let match;
 

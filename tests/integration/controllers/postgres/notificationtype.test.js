@@ -284,7 +284,7 @@ describe('/api/notificationtypes', () => {
       request(server).post('/api/notification-types').send({
         name,
         template_subject: 'notif subj',
-        template_body: 'notif body {{name}} {{date}}',
+        template_body: 'notif body {name}} {date}}',
         event: eventId,
       });
 
