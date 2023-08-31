@@ -111,7 +111,7 @@ describe('validate function', () => {
 
 describe('extractTags function', () => {
   it('should extract tags from a string', () => {
-    const str = 'Hello {{name}}, your {{event}} is happening soon.';
+    const str = 'Hello {name}, your {event} is happening soon.';
     const tags = extractTags(str);
 
     expect(tags).toEqual(['name', 'event']);
