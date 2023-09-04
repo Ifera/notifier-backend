@@ -446,6 +446,23 @@ describe('/api/apps', () => {
       expect(res.status).toBe(StatusCodes.NOT_FOUND);
     });
 
+    it('should return 409 if app with the same name already exists', async () => {
+      let app2 = {
+        name: 'app2',
+        is_active: true,
+      };
+
+      app2 = await knex('applications').insert(app2).returning('*');
+      app2 = app2[0]; // eslint-disable-line
+
+      newName = 'app';
+      id = app2.id;
+
+      const res = await exec();
+
+      expect(res.status).toBe(StatusCodes.CONFLICT);
+    });
+
     it('should update the app if input is valid', async () => {
       const res = await exec();
       const updatedApp = await knex('applications').where({ id }).first();

@@ -104,6 +104,17 @@ async function updateApp(id, obj) {
   const app = await getAppByID(id);
   if (!app) return false;
 
+  // check if app with same name already exists
+  if (obj.name && obj.name !== app.name) {
+    const appExists = await Application.find({
+      name: obj.name,
+      is_deleted: false,
+    });
+
+    if (appExists.length > 0)
+      throw new ConflictError('App with the same name already exists');
+  }
+
   Object.assign(app, obj);
   app.modified_at = Date.now();
 

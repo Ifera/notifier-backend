@@ -417,7 +417,7 @@ describe('/api/apps', () => {
       request(server).patch(`/api/apps/${id}`).send({ name: newName });
 
     beforeEach(async () => {
-      app = new Application({ name: 'app' });
+      app = new Application({ name: 'app', is_active: true });
       await app.save();
 
       id = app._id;
@@ -430,6 +430,22 @@ describe('/api/apps', () => {
       const res = await exec();
 
       expect(res.status).toBe(StatusCodes.NOT_FOUND);
+    });
+
+    it('should return 409 if app with the same name already exists', async () => {
+      let app2 = new Application({
+        name: 'app2',
+        is_active: true,
+      });
+
+      app2 = await app2.save();
+
+      newName = 'app';
+      id = app2.id;
+
+      const res = await exec();
+
+      expect(res.status).toBe(StatusCodes.CONFLICT);
     });
 
     it('should update the app if input is valid', async () => {

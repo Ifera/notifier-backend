@@ -113,6 +113,17 @@ async function getApps({
 }
 
 async function updateApp(id, req) {
+  // check if app with same name already exists
+  if (req.name) {
+    const appExists = await knex('applications')
+      .select('*')
+      .where({ name: req.name, is_deleted: false })
+      .whereNot({ id }); // exclude current app
+
+    if (appExists.length > 0)
+      throw new ConflictError('Application with the same name already exists');
+  }
+
   const ret = await knex('applications')
     .update(req)
     .where({ id })

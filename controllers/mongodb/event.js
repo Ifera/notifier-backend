@@ -123,6 +123,20 @@ async function updateEvent(id, obj) {
   const event = await getEventByID(id);
   if (!event) return false;
 
+  // check if event with same name and app id already exists
+  if (obj.name && obj.name !== event.name) {
+    const eventExists = await Event.findOne({
+      name: obj.name,
+      application: event.application,
+      is_deleted: false,
+    });
+
+    if (eventExists)
+      throw new ConflictError(
+        'Event with the same name and application ID already exists',
+      );
+  }
+
   Object.assign(event, obj);
   event.modified_at = Date.now();
 

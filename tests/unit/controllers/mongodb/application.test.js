@@ -168,6 +168,28 @@ describe('MongoDB Application Controller', () => {
 
   // Test updateApp function
   describe('updateApp', () => {
+    it('should throw ConfliceError if application with the same name exists', async () => {
+      Application.findOne = jest.fn(() => ({
+        exec: jest.fn(() => ({
+          _id: 'testAppId',
+          name: 'Test App',
+          is_deleted: false,
+        })),
+      }));
+
+      Application.find = jest.fn(() => [
+        {
+          _id: 'testAppId',
+          name: 'Test App',
+          is_deleted: false,
+        },
+      ]);
+
+      expect(async () => {
+        await updateApp('testAppId', { name: 'Test App' });
+      }).rejects.toThrow(ConflictError);
+    });
+
     it('should update an application by ID', async () => {
       Application.findOne = jest.fn(() => ({
         exec: jest.fn(() => ({
@@ -184,6 +206,8 @@ describe('MongoDB Application Controller', () => {
           }),
         ),
       }));
+
+      Application.find = jest.fn(() => []);
 
       const updatedApp = await updateApp('testAppId', { name: 'Updated App' });
 

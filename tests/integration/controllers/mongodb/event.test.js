@@ -406,6 +406,23 @@ describe('/api/events', () => {
       expect(res.status).toBe(StatusCodes.NOT_FOUND);
     });
 
+    it('should return 409 if event with the same name and application ID already exists', async () => {
+      let event2 = new Event({
+        name: 'event2',
+        is_active: true,
+        application: appId,
+      });
+
+      event2 = await event2.save();
+
+      newName = 'event';
+      id = event2.id;
+
+      const res = await exec();
+
+      expect(res.status).toBe(StatusCodes.CONFLICT);
+    });
+
     it('should update the event if input is valid', async () => {
       const res = await exec();
       const updatedEvent = await Event.findById(id);

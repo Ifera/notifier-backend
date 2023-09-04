@@ -133,6 +133,17 @@ async function getEvents({
 }
 
 async function updateEvent(id, req) {
+  // check if event with same name already exists
+  if (req.name) {
+    const eventExists = await knex('events')
+      .select('*')
+      .where({ name: req.name, is_deleted: false })
+      .whereNot({ id }); // exclude current event
+
+    if (eventExists.length > 0)
+      throw new ConflictError('Event with the same name already exists');
+  }
+
   const ret = await knex('events').update(req).where({ id }).returning('*');
   return ret.length === 0 ? null : ret[0];
 }

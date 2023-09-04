@@ -138,10 +138,41 @@ describe('PostgreSQL Application Controller', () => {
 
   // Test updateApp function
   describe('updateApp', () => {
+    it('should throw ConfliceError if application with the same name exists', async () => {
+      const updatedApp = { id: 1, name: 'Updated App' };
+
+      knex.mockReturnValue({
+        select: jest.fn().mockReturnValue({
+          where: jest.fn().mockReturnValue({
+            whereNot: jest.fn().mockReturnValue([{ name: 'Updated App' }]),
+          }),
+        }),
+
+        update: jest.fn().mockReturnValue({
+          where: jest.fn().mockReturnValue({
+            returning: jest.fn().mockReturnValue([updatedApp]),
+          }),
+        }),
+      });
+
+      const id = 1;
+      const req = { name: 'Updated App' };
+
+      expect(async () => {
+        await updateApp(id, req);
+      }).rejects.toThrow(ConflictError);
+    });
+
     it('should update an application', async () => {
       const updatedApp = { id: 1, name: 'Updated App' };
 
       knex.mockReturnValue({
+        select: jest.fn().mockReturnValue({
+          where: jest.fn().mockReturnValue({
+            whereNot: jest.fn().mockReturnValue([]), // Simulate no conflict
+          }),
+        }),
+
         update: jest.fn().mockReturnValue({
           where: jest.fn().mockReturnValue({
             returning: jest.fn().mockReturnValue([updatedApp]),
@@ -161,6 +192,12 @@ describe('PostgreSQL Application Controller', () => {
       const req = { name: 'Updated App' };
 
       knex.mockReturnValue({
+        select: jest.fn().mockReturnValue({
+          where: jest.fn().mockReturnValue({
+            whereNot: jest.fn().mockReturnValue([]), // Simulate no conflict
+          }),
+        }),
+
         update: jest.fn().mockReturnValue({
           where: jest.fn().mockReturnValue({
             returning: jest.fn().mockReturnValue([]), // Simulate no update

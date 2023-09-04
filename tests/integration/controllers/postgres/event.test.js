@@ -421,6 +421,24 @@ describe('/api/events', () => {
       expect(res.status).toBe(StatusCodes.NOT_FOUND);
     });
 
+    it('should return 409 if event with the same name and application ID already exists', async () => {
+      let event2 = {
+        name: 'event2',
+        is_active: true,
+        application: appId,
+      };
+
+      event2 = await knex('events').insert(event2).returning('*');
+      event2 = event2[0]; // eslint-disable-line
+
+      newName = 'event';
+      id = event2.id;
+
+      const res = await exec();
+
+      expect(res.status).toBe(StatusCodes.CONFLICT);
+    });
+
     it('should update the event if input is valid', async () => {
       const res = await exec();
       const updatedEvent = await knex('events').where({ id }).first();
