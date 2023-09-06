@@ -131,8 +131,8 @@ describe('MongoDB Application Controller', () => {
 
       const result = await getApps(options);
 
-      expect(result.total_apps).toBe(3);
-      expect(result.apps).toHaveLength(3);
+      expect(result.total_count).toBe(3);
+      expect(result.results).toHaveLength(3);
       expect(countDocumentsMock).toHaveBeenCalledWith(
         expect.objectContaining({ is_active: true, is_deleted: false }),
       );
@@ -161,8 +161,8 @@ describe('MongoDB Application Controller', () => {
 
       const result = await getApps(options);
 
-      expect(result.total_apps).toBe(3);
-      expect(result.apps).toHaveLength(3);
+      expect(result.total_count).toBe(3);
+      expect(result.results).toHaveLength(3);
     });
   });
 

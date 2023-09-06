@@ -75,7 +75,7 @@ describe('/api/notificationtypes', () => {
         event: eventId,
       });
 
-      const notifs = res.body.notification_types;
+      const notifs = res.body.results;
 
       expect(res.status).toBe(StatusCodes.OK);
       expect(notifs.length).toBe(2);
@@ -107,7 +107,7 @@ describe('/api/notificationtypes', () => {
         event: eventId,
       });
 
-      const notifs = res.body.notification_types;
+      const notifs = res.body.results;
 
       expect(res.status).toBe(StatusCodes.OK);
       expect(notifs.length).toBe(1);
@@ -148,7 +148,7 @@ describe('/api/notificationtypes', () => {
       });
 
       expect(res1.status).toBe(StatusCodes.OK);
-      expect(res1.body.notification_types.length).toBe(2);
+      expect(res1.body.results.length).toBe(2);
 
       const res2 = await request(server).get('/api/notification-types/').query({
         event: eventId,
@@ -157,7 +157,7 @@ describe('/api/notificationtypes', () => {
       });
 
       expect(res2.status).toBe(StatusCodes.OK);
-      expect(res2.body.notification_types.length).toBe(1);
+      expect(res2.body.results.length).toBe(1);
     });
 
     it('should return all events sorted by their name in ascending order', async () => {
@@ -193,7 +193,7 @@ describe('/api/notificationtypes', () => {
         sortOrder: 1,
       });
 
-      const notifs = res.body.notification_types;
+      const notifs = res.body.results;
 
       expect(res.status).toBe(StatusCodes.OK);
       expect(notifs.length).toBe(3);
@@ -234,7 +234,7 @@ describe('/api/notificationtypes', () => {
         like: 'log',
       });
 
-      const notifs = res.body.notification_types;
+      const notifs = res.body.results;
 
       expect(res.status).toBe(StatusCodes.OK);
       expect(notifs.length).toBe(2);

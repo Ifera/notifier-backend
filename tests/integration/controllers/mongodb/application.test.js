@@ -43,10 +43,10 @@ describe('/api/apps', () => {
       const res = await request(server).get('/api/apps/');
 
       expect(res.status).toBe(StatusCodes.OK);
-      expect(res.body.apps.length).toBe(3);
-      expect(res.body.apps.some((a) => a.name === 'ets')).toBeTruthy();
-      expect(res.body.apps.some((a) => a.name === 'egs')).toBeTruthy();
-      expect(res.body.apps.some((a) => a.name === 'xyz')).toBeTruthy();
+      expect(res.body.results.length).toBe(3);
+      expect(res.body.results.some((a) => a.name === 'ets')).toBeTruthy();
+      expect(res.body.results.some((a) => a.name === 'egs')).toBeTruthy();
+      expect(res.body.results.some((a) => a.name === 'xyz')).toBeTruthy();
     });
 
     it('should return all active apps', async () => {
@@ -73,9 +73,9 @@ describe('/api/apps', () => {
       const res = await request(server).get('/api/apps/');
 
       expect(res.status).toBe(StatusCodes.OK);
-      expect(res.body.apps.length).toBe(2);
-      expect(res.body.apps.some((a) => a.name === 'ets')).toBeTruthy();
-      expect(res.body.apps.some((a) => a.name === 'xyz')).toBeTruthy();
+      expect(res.body.results.length).toBe(2);
+      expect(res.body.results.some((a) => a.name === 'ets')).toBeTruthy();
+      expect(res.body.results.some((a) => a.name === 'xyz')).toBeTruthy();
     });
 
     it('should return 2 apps on page 1 and a single app on page 2', async () => {
@@ -104,14 +104,14 @@ describe('/api/apps', () => {
       );
 
       expect(res1.status).toBe(StatusCodes.OK);
-      expect(res1.body.apps.length).toBe(2);
+      expect(res1.body.results.length).toBe(2);
 
       const res2 = await request(server).get(
         '/api/apps/?pageNumber=2&pageSize=2',
       );
 
       expect(res2.status).toBe(StatusCodes.OK);
-      expect(res2.body.apps.length).toBe(1);
+      expect(res2.body.results.length).toBe(1);
     });
 
     it('should return all apps sorted by their name in ascending order', async () => {
@@ -140,10 +140,10 @@ describe('/api/apps', () => {
       );
 
       expect(res.status).toBe(StatusCodes.OK);
-      expect(res.body.apps.length).toBe(3);
-      expect(res.body.apps[0].name).toBe('egs');
-      expect(res.body.apps[1].name).toBe('ets');
-      expect(res.body.apps[2].name).toBe('xyz');
+      expect(res.body.results.length).toBe(3);
+      expect(res.body.results[0].name).toBe('egs');
+      expect(res.body.results[1].name).toBe('ets');
+      expect(res.body.results[2].name).toBe('xyz');
     });
 
     it('should return all apps containing "e" in their name', async () => {
@@ -170,9 +170,9 @@ describe('/api/apps', () => {
       const res = await request(server).get('/api/apps/?like=e');
 
       expect(res.status).toBe(StatusCodes.OK);
-      expect(res.body.apps.length).toBe(2);
-      expect(res.body.apps.some((a) => a.name === 'ets')).toBeTruthy();
-      expect(res.body.apps.some((a) => a.name === 'egs')).toBeTruthy();
+      expect(res.body.results.length).toBe(2);
+      expect(res.body.results.some((a) => a.name === 'ets')).toBeTruthy();
+      expect(res.body.results.some((a) => a.name === 'egs')).toBeTruthy();
     });
   });
 

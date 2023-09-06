@@ -59,9 +59,11 @@ describe('/api/events', () => {
       });
 
       expect(res.status).toBe(StatusCodes.OK);
-      expect(res.body.events.length).toBe(2);
-      expect(res.body.events.some((a) => a.name === 'on-login')).toBeTruthy();
-      expect(res.body.events.some((a) => a.name === 'on-message')).toBeTruthy();
+      expect(res.body.results.length).toBe(2);
+      expect(res.body.results.some((a) => a.name === 'on-login')).toBeTruthy();
+      expect(
+        res.body.results.some((a) => a.name === 'on-message'),
+      ).toBeTruthy();
     });
 
     it('should return all active events of an app', async () => {
@@ -85,8 +87,8 @@ describe('/api/events', () => {
       });
 
       expect(res.status).toBe(StatusCodes.OK);
-      expect(res.body.events.length).toBe(1);
-      expect(res.body.events.some((a) => a.name === 'on-login')).toBeTruthy();
+      expect(res.body.results.length).toBe(1);
+      expect(res.body.results.some((a) => a.name === 'on-login')).toBeTruthy();
     });
 
     it('should return 2 events on page 1 and a single event on page 2', async () => {
@@ -117,7 +119,7 @@ describe('/api/events', () => {
       });
 
       expect(res1.status).toBe(StatusCodes.OK);
-      expect(res1.body.events.length).toBe(2);
+      expect(res1.body.results.length).toBe(2);
 
       const res2 = await request(server).get('/api/events/').query({
         application: appId,
@@ -126,7 +128,7 @@ describe('/api/events', () => {
       });
 
       expect(res2.status).toBe(StatusCodes.OK);
-      expect(res2.body.events.length).toBe(1);
+      expect(res2.body.results.length).toBe(1);
     });
 
     it('should return all events sorted by their name in ascending order', async () => {
@@ -157,10 +159,10 @@ describe('/api/events', () => {
       });
 
       expect(res.status).toBe(StatusCodes.OK);
-      expect(res.body.events.length).toBe(3);
-      expect(res.body.events[0].name).toBe('on-login');
-      expect(res.body.events[1].name).toBe('on-logout');
-      expect(res.body.events[2].name).toBe('on-message');
+      expect(res.body.results.length).toBe(3);
+      expect(res.body.results[0].name).toBe('on-login');
+      expect(res.body.results[1].name).toBe('on-logout');
+      expect(res.body.results[2].name).toBe('on-message');
     });
 
     it('should return all apps containing "log" in their name', async () => {
@@ -190,9 +192,9 @@ describe('/api/events', () => {
       });
 
       expect(res.status).toBe(StatusCodes.OK);
-      expect(res.body.events.length).toBe(2);
-      expect(res.body.events.some((a) => a.name === 'on-login')).toBeTruthy();
-      expect(res.body.events.some((a) => a.name === 'on-logout')).toBeTruthy();
+      expect(res.body.results.length).toBe(2);
+      expect(res.body.results.some((a) => a.name === 'on-login')).toBeTruthy();
+      expect(res.body.results.some((a) => a.name === 'on-logout')).toBeTruthy();
     });
   });
 

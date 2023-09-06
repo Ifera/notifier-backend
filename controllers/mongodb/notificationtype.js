@@ -100,8 +100,8 @@ async function getNotificationTypes({
     return {
       current_page: 1,
       last_page: 1,
-      total_notification_types: totalNotifs,
-      notification_types: await query,
+      total_count: totalNotifs,
+      results: await query,
     };
   }
 
@@ -117,8 +117,8 @@ async function getNotificationTypes({
   return {
     current_page: pageNumber,
     last_page: lastPage,
-    total_notification_types: totalNotifs,
-    notification_types: await query.skip(skipCount).limit(ps),
+    total_count: totalNotifs,
+    results: await query.skip(skipCount).limit(ps),
   };
 }
 

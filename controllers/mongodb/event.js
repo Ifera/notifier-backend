@@ -97,8 +97,8 @@ async function getEvents({
     return {
       current_page: 1,
       last_page: 1,
-      total_events: totalEvents,
-      events: await query,
+      total_count: totalEvents,
+      results: await query,
     };
   }
 
@@ -114,8 +114,8 @@ async function getEvents({
   return {
     current_page: pageNumber,
     last_page: lastPage,
-    total_events: totalEvents,
-    events: await query.skip(skipCount).limit(ps),
+    total_count: totalEvents,
+    results: await query.skip(skipCount).limit(ps),
   };
 }
 

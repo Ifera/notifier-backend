@@ -130,8 +130,8 @@ describe('PostgreSQL Application Controller', () => {
       expect(result).toEqual({
         current_page: 1,
         last_page: 1,
-        total_apps: expectedApps.length,
-        apps: expectedApps,
+        total_count: expectedApps.length,
+        results: expectedApps,
       });
     });
   });

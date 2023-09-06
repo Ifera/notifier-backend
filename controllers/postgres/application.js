@@ -90,8 +90,8 @@ async function getApps({
     return {
       current_page: 1,
       last_page: 1,
-      total_apps: totalApps,
-      apps: await query,
+      total_count: totalApps,
+      results: await query,
     };
   }
 
@@ -107,8 +107,8 @@ async function getApps({
   return {
     current_page: pageNumber,
     last_page: lastPage,
-    total_apps: totalApps,
-    apps: await query.limit(ps).offset(skipCount),
+    total_count: totalApps,
+    results: await query.limit(ps).offset(skipCount),
   };
 }
 
