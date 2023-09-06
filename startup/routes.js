@@ -1,5 +1,6 @@
 const express = require('express');
 const winston = require('winston');
+const cors = require('cors');
 
 // middleware
 const traceId = require('../middleware/traceId');
@@ -23,6 +24,7 @@ module.exports = function (app) {
 
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
+  app.use(cors());
 
   app.use(traceId);
   app.use(logger.expressLogger);

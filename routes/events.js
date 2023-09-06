@@ -35,7 +35,7 @@ const filteredProps = [
 
 router.get('/', validateQueryParams(validateQP), async (req, res) => {
   const result = await getEvents(req.query);
-  result.events = _.map(result.events, _.partialRight(_.pick, filteredProps));
+  result.results = _.map(result.results, _.partialRight(_.pick, filteredProps));
 
   res.send(result);
 });

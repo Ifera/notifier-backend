@@ -43,10 +43,7 @@ const filteredProps = [
 
 router.get('/', validateQueryParams(validateQP), async (req, res) => {
   const result = await getNotificationTypes(req.query);
-  result.notification_types = _.map(
-    result.notification_types,
-    _.partialRight(_.pick, filteredProps),
-  );
+  result.results = _.map(result.results, _.partialRight(_.pick, filteredProps));
 
   res.send(result);
 });
