@@ -84,6 +84,7 @@ describe('/api/events', () => {
 
       const res = await request(server).get('/api/events/').query({
         application: appId,
+        isActive: true,
       });
 
       expect(res.status).toBe(StatusCodes.OK);

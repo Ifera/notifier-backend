@@ -70,7 +70,9 @@ describe('/api/apps', () => {
 
       await Application.collection.insertMany(apps);
 
-      const res = await request(server).get('/api/apps/');
+      const res = await request(server).get('/api/apps/').query({
+        isActive: true,
+      });
 
       expect(res.status).toBe(StatusCodes.OK);
       expect(res.body.results.length).toBe(2);

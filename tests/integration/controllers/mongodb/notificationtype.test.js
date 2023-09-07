@@ -100,6 +100,7 @@ describe('/api/notificationtypes', () => {
 
       const res = await request(server).get('/api/notification-types/').query({
         event: eventId,
+        isActive: true,
       });
 
       const notifs = res.body.results;

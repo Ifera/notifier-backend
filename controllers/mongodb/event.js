@@ -71,7 +71,7 @@ async function getEvents({
   sortOrder = 1,
   pageNumber = 0,
   pageSize = 3,
-  isActive = true,
+  isActive = undefined,
 }) {
   if (!application)
     throw new BadRequest('"application" (application ID) is required');
@@ -84,11 +84,11 @@ async function getEvents({
   const nameRegex = new RegExp(like, 'i'); // 'i' -> case-insensitive
   const findQuery = {
     application,
-    is_active: isActive,
     is_deleted: false, // only return non-deleted apps
   };
 
   if (like) findQuery.name = nameRegex;
+  if (isActive !== undefined) findQuery.is_active = isActive;
 
   const totalEvents = await Event.countDocuments(findQuery);
   const query = Event.find(findQuery).sort({ [sortBy]: sortDirection });

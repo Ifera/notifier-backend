@@ -72,7 +72,7 @@ async function getEvents({
   sortOrder = 1,
   pageNumber = 0,
   pageSize = 3,
-  isActive = true,
+  isActive = undefined,
 }) {
   pageNumber = Number(pageNumber);
   pageSize = Number(pageSize);
@@ -81,13 +81,16 @@ async function getEvents({
   const totalEventsQuery = knex('events')
     .count('id as totalEvents')
     .where('is_deleted', false)
-    .andWhere('is_active', isActive)
     .andWhere('application', application)
     .first();
 
   // Filter by name using regex (matches anywhere in the name)
   if (like) {
     totalEventsQuery.andWhere('name', '~*', `.*${like}.*`); // Case-insensitive regex search
+  }
+
+  if (isActive !== undefined) {
+    totalEventsQuery.andWhere('is_active', isActive);
   }
 
   const res = await totalEventsQuery;
@@ -97,13 +100,16 @@ async function getEvents({
   const query = knex('events')
     .select('*')
     .where('is_deleted', false)
-    .andWhere('is_active', isActive)
     .andWhere('application', application)
     .orderBy(sortBy, sortDirection)
     .returning('*');
 
   if (like) {
     query.andWhere('name', '~*', `.*${like}.*`); // Case-insensitive regex search
+  }
+
+  if (isActive !== undefined) {
+    query.andWhere('is_active', isActive);
   }
 
   if (pageNumber <= 0 || totalEvents <= 0) {

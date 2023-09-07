@@ -93,7 +93,7 @@ async function getNotificationTypes({
   sortOrder = 1,
   pageNumber = 0,
   pageSize = 3,
-  isActive = true,
+  isActive = undefined,
 }) {
   pageNumber = Number(pageNumber);
   pageSize = Number(pageSize);
@@ -102,13 +102,16 @@ async function getNotificationTypes({
   const totalNotifQuery = knex('notificationtypes')
     .count('id as totalNotifs')
     .where('is_deleted', false)
-    .andWhere('is_active', isActive)
     .andWhere('event', event)
     .first();
 
   // Filter by name using regex (matches anywhere in the name)
   if (like) {
     totalNotifQuery.andWhere('name', '~*', `.*${like}.*`); // Case-insensitive regex search
+  }
+
+  if (isActive !== undefined) {
+    totalNotifQuery.andWhere('is_active', isActive);
   }
 
   const res = await totalNotifQuery;
@@ -118,13 +121,16 @@ async function getNotificationTypes({
   const query = knex('notificationtypes')
     .select('*')
     .where('is_deleted', false)
-    .andWhere('is_active', isActive)
     .andWhere('event', event)
     .orderBy(sortBy, sortDirection)
     .returning('*');
 
   if (like) {
     query.andWhere('name', '~*', `.*${like}.*`);
+  }
+
+  if (isActive !== undefined) {
+    query.andWhere('is_active', isActive);
   }
 
   let notifs = await query;

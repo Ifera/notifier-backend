@@ -73,7 +73,7 @@ async function getNotificationTypes({
   sortOrder = 1,
   pageNumber = 0,
   pageSize = 3,
-  isActive = true,
+  isActive = undefined,
 }) {
   if (!event) throw new Error('"event" (event ID) is required');
 
@@ -85,11 +85,11 @@ async function getNotificationTypes({
   const nameRegex = new RegExp(like, 'i'); // 'i' -> case-insensitive
   const findQuery = {
     event,
-    is_active: isActive,
     is_deleted: false, // only return non-deleted apps
   };
 
   if (like) findQuery.name = nameRegex;
+  if (isActive !== undefined) findQuery.is_active = isActive;
 
   const totalNotifs = await NotificationType.countDocuments(findQuery);
   const query = NotificationType.find(findQuery).sort({
