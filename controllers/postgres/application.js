@@ -56,7 +56,7 @@ async function getApps({
   sortOrder = 1,
   pageNumber = 0,
   pageSize = 3,
-  isActive = true,
+  isActive = undefined,
 }) {
   pageNumber = Number(pageNumber);
   pageSize = Number(pageSize);
@@ -64,12 +64,16 @@ async function getApps({
 
   const totalAppsQuery = knex('applications')
     .count('id as totalApps')
-    .where({ is_deleted: false, is_active: isActive })
+    .where({ is_deleted: false })
     .first();
 
   // Filter by name using regex (matches anywhere in the name)
   if (like) {
     totalAppsQuery.andWhere('name', '~*', `.*${like}.*`); // Case-insensitive regex search
+  }
+
+  if (isActive !== undefined) {
+    totalAppsQuery.andWhere({ is_active: isActive });
   }
 
   const res = await totalAppsQuery;
@@ -78,12 +82,16 @@ async function getApps({
 
   const query = knex('applications')
     .select('*')
-    .where({ is_deleted: false, is_active: isActive })
+    .where({ is_deleted: false })
     .orderBy(sortBy, sortDirection)
     .returning('*');
 
   if (like) {
     query.andWhere('name', '~*', `.*${like}.*`); // Case-insensitive regex search
+  }
+
+  if (isActive !== undefined) {
+    query.andWhere({ is_active: isActive });
   }
 
   if (pageNumber <= 0) {

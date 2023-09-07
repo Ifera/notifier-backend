@@ -56,7 +56,7 @@ async function getApps({
   sortOrder = 1,
   pageNumber = 0,
   pageSize = 3,
-  isActive = true,
+  isActive = undefined,
 }) {
   pageNumber = Number(pageNumber);
   pageSize = Number(pageSize);
@@ -65,11 +65,11 @@ async function getApps({
   const sortDirection = sortOrder === -1 ? 'desc' : 'asc';
   const nameRegex = new RegExp(like, 'i'); // 'i' -> case-insensitive
   const findQuery = {
-    is_active: isActive,
     is_deleted: false, // only return non-deleted apps
   };
 
   if (like) findQuery.name = nameRegex;
+  if (isActive !== undefined) findQuery.is_active = isActive;
 
   const totalApps = await Application.countDocuments(findQuery);
   const query = Application.find(findQuery).sort({ [sortBy]: sortDirection });
