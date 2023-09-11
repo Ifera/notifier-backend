@@ -93,7 +93,7 @@ async function getEvents({
   const totalEvents = await Event.countDocuments(findQuery);
   const query = Event.find(findQuery).sort({ [sortBy]: sortDirection });
 
-  if (pageNumber <= 0) {
+  if (pageNumber <= 0 || totalEvents === 0) {
     return {
       current_page: 1,
       last_page: 1,

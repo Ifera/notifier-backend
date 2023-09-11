@@ -74,7 +74,7 @@ async function getApps({
   const totalApps = await Application.countDocuments(findQuery);
   const query = Application.find(findQuery).sort({ [sortBy]: sortDirection });
 
-  if (pageNumber <= 0) {
+  if (pageNumber <= 0 || totalApps === 0) {
     return {
       current_page: 1,
       last_page: 1,

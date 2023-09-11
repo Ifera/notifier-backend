@@ -96,7 +96,7 @@ async function getNotificationTypes({
     [sortBy]: sortDirection,
   });
 
-  if (pageNumber <= 0) {
+  if (pageNumber <= 0 || totalNotifs === 0) {
     return {
       current_page: 1,
       last_page: 1,
