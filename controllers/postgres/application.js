@@ -94,7 +94,7 @@ async function getApps({
     query.andWhere({ is_active: isActive });
   }
 
-  if (pageNumber <= 0) {
+  if (pageNumber <= 0 || totalApps <= 0) {
     return {
       current_page: 1,
       last_page: 1,
