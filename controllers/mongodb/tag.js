@@ -12,6 +12,11 @@ async function upsertTags(tags) {
   return Tag.bulkWrite(bulkUpdateTags);
 }
 
+async function getTags() {
+  return Tag.find().select('label');
+}
+
 module.exports = {
   upsertTags,
+  getTags,
 };

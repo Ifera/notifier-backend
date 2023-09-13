@@ -8,6 +8,11 @@ async function upsertTags(tags) {
   return knex('tags').insert(_tags).onConflict('label').ignore();
 }
 
+async function getTags() {
+  return knex('tags').select('label');
+}
+
 module.exports = {
   upsertTags,
+  getTags,
 };
