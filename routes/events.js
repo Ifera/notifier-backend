@@ -3,6 +3,8 @@ const _ = require('lodash');
 
 const router = express.Router();
 
+const auth = require('../middleware/auth');
+
 const {
   validateReq,
   validateQueryParams,
@@ -32,6 +34,8 @@ const filteredProps = [
   'modified_at',
   'application',
 ];
+
+router.use(auth);
 
 router.get('/', validateQueryParams(validateQP), async (req, res) => {
   const result = await getEvents(req.query);

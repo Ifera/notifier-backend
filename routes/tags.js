@@ -6,6 +6,10 @@ const { getTags } = require(`../controllers/${DB_TYPE}/tag`); // eslint-disable-
 
 const router = express.Router();
 
+const auth = require('../middleware/auth');
+
+router.use(auth);
+
 router.get('/', async (req, res) => {
   const result = await getTags(req.query);
 

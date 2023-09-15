@@ -7,8 +7,10 @@
     "console": true
   },
 
+  "jwtPrivateKey": "notifier_dev_jwtPrivateKey",
+
   "db": {
-    "type": "postgres",
+    "type": "mongodb",
 
     "mongodb": {
       "uri": "mongodb://localhost:27017/notifier_dev"

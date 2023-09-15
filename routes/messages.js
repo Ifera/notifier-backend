@@ -3,6 +3,7 @@ const _ = require('lodash');
 
 const router = express.Router();
 
+const auth = require('../middleware/auth');
 const { validateReq } = require('../middleware/validate');
 const { validatePost } = require('../models/message');
 const { DB_TYPE } = require('../globals');
@@ -19,6 +20,8 @@ const filteredProps = [
   'created_at',
   'delivered_at',
 ];
+
+router.use(auth);
 
 router.post('/', validateReq(validatePost), async (req, res) => {
   const message = await createMessage(req.body);
