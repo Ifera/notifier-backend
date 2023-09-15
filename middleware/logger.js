@@ -1,6 +1,6 @@
 const winston = require('winston');
 const expressWinston = require('express-winston');
-
+const _ = require('lodash');
 const { combinedFormat } = require('../startup/logging');
 
 const expressLogger = expressWinston.logger({
@@ -15,7 +15,8 @@ const expressLogger = expressWinston.logger({
   }),
 
   msg: (req, res) => {
-    const body = JSON.stringify(req.body);
+    let body = _.omit(req.body, ['password']);
+    body = JSON.stringify(body);
     return `${req.method} ${req.url} ${res.statusCode} ${res.responseTime}ms - ${body}`;
   },
 });

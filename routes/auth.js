@@ -1,4 +1,5 @@
 const express = require('express');
+const _ = require('lodash');
 
 const { DB_TYPE } = require('../globals');
 
@@ -12,9 +13,9 @@ router.post('/', async (req, res) => {
 });
 
 router.post('/register', async (req, res) => {
-  const result = await createUser(req.body);
+  await createUser(req.body);
 
-  res.send(result);
+  res.send('Success');
 });
 
 module.exports = router;
