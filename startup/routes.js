@@ -31,12 +31,15 @@ module.exports = function (app) {
   app.use(traceId);
   app.use(logger.expressLogger);
 
+  addRoute(app, '/api/auth', auth);
+
+  app.use(auth);
+
   addRoute(app, '/api/apps', apps);
   addRoute(app, '/api/events', events);
   addRoute(app, '/api/notification-types', notificationTypes);
   addRoute(app, '/api/message', messages);
   addRoute(app, '/api/tags', tags);
-  addRoute(app, '/api/auth', auth);
 
   app.use(error);
 };
