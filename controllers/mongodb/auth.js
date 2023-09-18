@@ -13,10 +13,6 @@ async function login(req) {
 
   return {
     token,
-    user: {
-      _id: user._id,
-      email: user.email,
-    },
   };
 }
 
