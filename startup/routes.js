@@ -6,6 +6,7 @@ const cors = require('cors');
 const traceId = require('../middleware/traceId');
 const logger = require('../middleware/logger');
 const error = require('../middleware/error');
+const authMiddleware = require('../middleware/auth');
 
 // routes
 const apps = require('../routes/applications');
@@ -33,7 +34,7 @@ module.exports = function (app) {
 
   addRoute(app, '/api/auth', auth);
 
-  app.use(auth);
+  app.use(authMiddleware);
 
   addRoute(app, '/api/apps', apps);
   addRoute(app, '/api/events', events);
