@@ -25,12 +25,19 @@ async function createUser(req) {
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(password, salt);
 
-  const newUser = new User({
+  let newUser = new User({
     email,
     password: hashedPassword,
   });
 
-  return newUser.save();
+  newUser = await newUser.save();
+
+  if (!newUser) throw new BadRequest('Error creating user');
+
+  const token = newUser.generateAuthToken();
+  return {
+    token,
+  };
 }
 
 module.exports = {

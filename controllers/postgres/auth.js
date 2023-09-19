@@ -8,6 +8,14 @@ const {
   ConflictError,
 } = require('../../utils/error');
 
+const generateAuthToken = (user) => {
+  const jwtPrivateKey = config.get('jwtPrivateKey');
+  const token = jwt.sign({ _id: user.id, email: user.email }, jwtPrivateKey, {
+    expiresIn: '1h',
+  });
+  return token;
+};
+
 async function createUser(req) {
   const { email, password } = req;
 
@@ -29,7 +37,10 @@ async function createUser(req) {
 
   const ret = await knex('users').insert(newUser).returning('*');
 
-  return !ret ? null : ret[0];
+  const token = generateAuthToken(ret);
+  return {
+    token,
+  };
 }
 
 async function login(req) {
@@ -44,11 +55,7 @@ async function login(req) {
   if (!validPassword) throw new BadRequest('Invalid email or password.');
 
   // TODO: Move this to Util/Models
-  const jwtPrivateKey = config.get('jwtPrivateKey');
-  const token = jwt.sign({ _id: user.id, email: user.email }, jwtPrivateKey, {
-    expiresIn: '1h',
-  });
-
+  const token = generateAuthToken(user);
   return {
     token,
   };
