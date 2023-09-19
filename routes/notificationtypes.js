@@ -18,6 +18,7 @@ const {
 } = require('../models/notificationtype');
 const { DB_TYPE } = require('../globals');
 const { BadRequest, NotFound } = require('../utils/error');
+const { trim } = require('../utils');
 
 const {
   createNotificationType,
@@ -61,6 +62,7 @@ router.get('/:id', validateObjectId, async (req, res) => {
 
 router.post('/', validateReq(validatePost), async (req, res) => {
   // extract tags from the body and set it with the request body
+  req.body = trim(req.body);
   req.body.tags = extractTags(req.body.template_body);
   const nt = await createNotificationType(req.body);
 
@@ -92,6 +94,8 @@ router.patch(
   async (req, res) => {
     if (Object.keys(req.body).length === 0)
       throw new BadRequest('The request body should not be empty');
+
+    req.body = trim(req.body);
 
     // extract tags from the body and set it with the request body
     if (req.body.template_body) {

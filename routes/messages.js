@@ -6,6 +6,7 @@ const router = express.Router();
 const { validateReq } = require('../middleware/validate');
 const { validatePost } = require('../models/message');
 const { DB_TYPE } = require('../globals');
+const { trim } = require('../utils');
 
 const { createMessage } = require(`../controllers/${DB_TYPE}/message`); // eslint-disable-line
 
@@ -21,7 +22,7 @@ const filteredProps = [
 ];
 
 router.post('/', validateReq(validatePost), async (req, res) => {
-  const message = await createMessage(req.body);
+  const message = await createMessage(trim(req.body));
   return res.send(_.pick(message, filteredProps));
 });
 

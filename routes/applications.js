@@ -13,6 +13,7 @@ const validateObjectId = require('../middleware/validateObjectId');
 const { validateQP, validatePost, validate } = require('../models/application');
 const { DB_TYPE } = require('../globals');
 const { BadRequest, NotFound } = require('../utils/error');
+const { trim } = require('../utils');
 
 const {
   createApp,
@@ -48,7 +49,7 @@ router.get('/:id', validateObjectId, async (req, res) => {
 });
 
 router.post('/', validateReq(validatePost), async (req, res) => {
-  const app = await createApp(req.body);
+  const app = await createApp(trim(req.body));
   return res.send(_.pick(app, filteredProps));
 });
 
@@ -75,7 +76,7 @@ router.patch(
     if (Object.keys(req.body).length === 0)
       throw new BadRequest('The request body should not be empty');
 
-    const app = await updateApp(req.params.id, req.body);
+    const app = await updateApp(req.params.id, trim(req.body));
 
     if (!app) throw new NotFound('The app with the given ID was not found.');
 

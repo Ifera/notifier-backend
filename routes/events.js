@@ -13,6 +13,7 @@ const validateObjectId = require('../middleware/validateObjectId');
 const { validateQP, validatePost, validate } = require('../models/event');
 const { DB_TYPE } = require('../globals');
 const { BadRequest, NotFound } = require('../utils/error');
+const { trim } = require('../utils');
 
 const {
   createEvent,
@@ -49,7 +50,7 @@ router.get('/:id', validateObjectId, async (req, res) => {
 });
 
 router.post('/', validateReq(validatePost), async (req, res) => {
-  const event = await createEvent(req.body);
+  const event = await createEvent(trim(req.body));
   return res.send(_.pick(event, filteredProps));
 });
 
@@ -76,7 +77,7 @@ router.patch(
     if (Object.keys(req.body).length === 0)
       throw new BadRequest('The request body should not be empty');
 
-    const event = await updateEvent(req.params.id, req.body);
+    const event = await updateEvent(req.params.id, trim(req.body));
 
     if (!event)
       throw new NotFound('The event with the given ID was not found.');
