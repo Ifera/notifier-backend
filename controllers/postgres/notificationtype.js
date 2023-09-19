@@ -15,10 +15,10 @@ async function createNotificationType(req) {
   // check if notification type with same name and event ID already exists
   const notifExists = await knex('notificationtypes')
     .where({
-      name: req.name,
       event: req.event,
       is_deleted: false,
     })
+    .where('name', 'ILIKE', req.name) // case-insensitive search
     .first();
 
   if (notifExists)
@@ -179,9 +179,9 @@ async function updateNotificationType(id, req) {
     const notifExists = await knex('notificationtypes')
       .select('*')
       .where({
-        name: req.name,
         is_deleted: false,
       })
+      .where('name', 'ILIKE', req.name) // case-insensitive search
       .whereNot({ id });
 
     if (notifExists.length > 0) {

@@ -4,7 +4,8 @@ const { ConflictError } = require('../../utils/error');
 async function createApp(req) {
   // check if app with same name already exists
   const appExists = await knex('applications')
-    .where({ name: req.name, is_deleted: false })
+    .where({ is_deleted: false })
+    .where('name', 'ILIKE', req.name) // case-insensitive search
     .first();
 
   if (appExists)
@@ -125,7 +126,8 @@ async function updateApp(id, req) {
   if (req.name) {
     const appExists = await knex('applications')
       .select('*')
-      .where({ name: req.name, is_deleted: false })
+      .where({ is_deleted: false })
+      .where('name', 'ILIKE', req.name) // case-insensitive search
       .whereNot({ id }); // exclude current app
 
     if (appExists.length > 0)

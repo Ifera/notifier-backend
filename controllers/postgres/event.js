@@ -15,10 +15,10 @@ async function createEvent(req) {
   // check if event with same name and application id already exists
   const eventExists = await knex('events')
     .where({
-      name: req.name,
       application: req.application,
       is_deleted: false,
     })
+    .where('name', 'ILIKE', req.name) // case-insensitive search
     .first();
 
   if (eventExists)
@@ -143,7 +143,8 @@ async function updateEvent(id, req) {
   if (req.name) {
     const eventExists = await knex('events')
       .select('*')
-      .where({ name: req.name, is_deleted: false })
+      .where({ is_deleted: false })
+      .where('name', 'ILIKE', req.name) // case-insensitive search
       .whereNot({ id }); // exclude current event
 
     if (eventExists.length > 0)

@@ -11,7 +11,10 @@ const {
 async function createUser(req) {
   const { email, password } = req;
 
-  const userExists = await knex('users').select('*').where({ email }).first();
+  const userExists = await knex('users')
+    .select('*')
+    .where('email', 'ILIKE', email)
+    .first();
 
   if (userExists)
     throw new ConflictError('User with same email already exists');
