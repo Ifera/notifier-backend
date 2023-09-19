@@ -1,6 +1,6 @@
 const bcrypt = require('bcrypt');
 const { User } = require('../../models/user');
-const { NotFoundError, BadRequest } = require('../../utils/error');
+const { BadRequest, ConflictError } = require('../../utils/error');
 
 async function login(req) {
   const user = await User.findOne({ email: req.email });
@@ -20,7 +20,7 @@ async function createUser(req) {
   const { email, password } = req;
 
   const user = await User.findOne({ email: req.email });
-  if (user) throw new BadRequest('User already registered.');
+  if (user) throw new ConflictError('User with same email already exists');
 
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(password, salt);
