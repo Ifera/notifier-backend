@@ -19,7 +19,7 @@ async function login(req) {
 async function createUser(req) {
   const { email, password } = req;
 
-  const user = await User.findOne({ email: req.email });
+  const user = await User.findOne({ email });
   if (user) throw new ConflictError('User with same email already exists');
 
   const salt = await bcrypt.genSalt(10);
