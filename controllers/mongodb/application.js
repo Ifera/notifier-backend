@@ -6,7 +6,7 @@ const { ConflictError } = require('../../utils/error');
 async function createApp(req) {
   // check if app with same name already exists
   const appExists = await Application.findOne({
-    name: req.name,
+    name: { $regex: new RegExp(req.name, 'i') },
     is_deleted: false,
   });
 
@@ -107,7 +107,7 @@ async function updateApp(id, obj) {
   // check if app with same name already exists
   if (obj.name && obj.name !== app.name) {
     const appExists = await Application.find({
-      name: obj.name,
+      name: { $regex: new RegExp(obj.name, 'i') },
       is_deleted: false,
     });
 

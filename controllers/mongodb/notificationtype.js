@@ -13,7 +13,7 @@ async function createNotificationType(req) {
 
   // check if notification type with same name and event id already exists
   const notifExists = await NotificationType.findOne({
-    name: req.name,
+    name: { $regex: new RegExp(req.name, 'i') },
     event: req.event,
     is_deleted: false,
   });
@@ -129,7 +129,7 @@ async function updateNotificationType(id, obj) {
   // check if notification type with same name and event id already exists
   if (obj.name && obj.name !== notif.name) {
     const notifExists = await NotificationType.findOne({
-      name: obj.name,
+      name: { $regex: new RegExp(obj.name, 'i') },
       event: notif.event,
       is_deleted: false,
     });
