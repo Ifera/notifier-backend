@@ -23,9 +23,7 @@ async function createEvent(req) {
   });
 
   if (eventExists)
-    throw new ConflictError(
-      'Event with the same name and application ID already exists',
-    );
+    throw new ConflictError('Event with the same name already exists');
 
   const event = new Event(req);
 
@@ -136,9 +134,7 @@ async function updateEvent(id, obj) {
     });
 
     if (eventExists)
-      throw new ConflictError(
-        'Event with the same name and application ID already exists',
-      );
+      throw new ConflictError('Event with the same name already exists');
   }
 
   Object.assign(event, obj);
