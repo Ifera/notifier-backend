@@ -10,17 +10,17 @@
   "jwtPrivateKey": "notifier_dev_jwtPrivateKey",
 
   "db": {
-    "type": "postgres",
+    "type": "mongodb",
 
     "mongodb": {
-      "uri": "mongodb://localhost:27017/notifier_dev"
+      "uri": "mongodb+srv://tayyabrashid:pass123@cluster0.tpol0xt.mongodb.net/notifier_dev"
     },
 
     "postgres": {
       "host": "localhost",
       "port": "5432",
       "user": "postgres",
-      "password": "abdullah",
+      "password": "gosaas",
       "schema": "notifier_dev"
     }
   }
