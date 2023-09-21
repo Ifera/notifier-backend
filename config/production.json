@@ -1,5 +1,5 @@
 {
-  "env": "production",
+  "env": "development",
   "port": 3000,
 
   "log": {
@@ -7,11 +7,20 @@
     "console": true
   },
 
+  "jwtPrivateKey": "notifier_dev_jwtPrivateKey",
+
   "db": {
+    "type": "mongodb",
+
+    "mongodb": {
+      "uri": "mongodb+srv://tayyabrashid:pass123@cluster0.tpol0xt.mongodb.net/notifier_dev"
+    },
+
     "postgres": {
       "host": "localhost",
       "port": "5432",
       "user": "postgres",
+      "password": "gosaas",
       "schema": "notifier_dev"
     }
   }
