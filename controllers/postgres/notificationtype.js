@@ -23,7 +23,7 @@ async function createNotificationType(req) {
 
   if (notifExists)
     throw new ConflictError(
-      'Notification type with the same name and event ID already exists',
+      'Notification type with the same name already exists',
     );
 
   const _req = { ...req };
@@ -186,7 +186,7 @@ async function updateNotificationType(id, req) {
 
     if (notifExists.length > 0) {
       throw new ConflictError(
-        'Notification type with the same name and event ID already exists',
+        'Notification type with the same name already exists',
       );
     }
   }

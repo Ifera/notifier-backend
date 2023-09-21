@@ -22,9 +22,7 @@ async function createEvent(req) {
     .first();
 
   if (eventExists)
-    throw new ConflictError(
-      'Event with the same name and application ID already exists',
-    );
+    throw new ConflictError('Event with the same name already exists');
 
   const ret = await knex('events').insert(req).returning('*');
 
