@@ -15,7 +15,7 @@ async function createEvent(req) {
 
   // check if event with same name and application id already exists
   const eventExists = await Event.findOne({
-    name: { $regex: new RegExp(req.name, 'i') },
+    name: { $regex: new RegExp(`^${req.name}$`, 'i') },
     application: req.application,
     is_deleted: false,
   });
@@ -126,7 +126,7 @@ async function updateEvent(id, obj) {
   // check if event with same name and app id already exists
   if (obj.name && obj.name !== event.name) {
     const eventExists = await Event.findOne({
-      name: { $regex: new RegExp(obj.name, 'i') },
+      name: { $regex: new RegExp(`^${obj.name}$`, 'i') },
       application: event.application,
       is_deleted: false,
     });
