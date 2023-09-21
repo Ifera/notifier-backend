@@ -14,8 +14,10 @@ async function createEvent(req) {
     throw new BadRequest('The application with the given ID was not found.');
 
   // check if event with same name and application id already exists
+  const escapedName = req.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const regexPattern = new RegExp(`^${escapedName}$`, 'i');
   const eventExists = await Event.findOne({
-    name: { $regex: new RegExp(`^${req.name}$`, 'i') },
+    name: { $regex: regexPattern },
     application: req.application,
     is_deleted: false,
   });
@@ -125,8 +127,10 @@ async function updateEvent(id, obj) {
 
   // check if event with same name and app id already exists
   if (obj.name && obj.name !== event.name) {
+    const escapedName = obj.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regexPattern = new RegExp(`^${escapedName}$`, 'i');
     const eventExists = await Event.findOne({
-      name: { $regex: new RegExp(`^${obj.name}$`, 'i') },
+      name: { $regex: regexPattern },
       application: event.application,
       is_deleted: false,
     });

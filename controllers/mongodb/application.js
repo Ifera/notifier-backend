@@ -4,12 +4,13 @@ const { NotificationType } = require('../../models/notificationtype');
 const { ConflictError } = require('../../utils/error');
 
 async function createApp(req) {
-  // check if app with same name already exists
+  const escapedName = req.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const regexPattern = new RegExp(`^${escapedName}$`, 'i');
+
   const appExists = await Application.findOne({
-    name: { $regex: new RegExp(`^${req.name}$`, 'i') },
+    name: { $regex: regexPattern },
     is_deleted: false,
   });
-
   if (appExists)
     throw new ConflictError('Application with the same name already exists');
 
@@ -106,8 +107,10 @@ async function updateApp(id, obj) {
 
   // check if app with same name already exists
   if (obj.name && obj.name !== app.name) {
+    const escapedName = obj.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regexPattern = new RegExp(`^${escapedName}$`, 'i');
     const appExists = await Application.find({
-      name: { $regex: new RegExp(`^${obj.name}$`, 'i') },
+      name: { $regex: regexPattern },
       is_deleted: false,
     });
 
