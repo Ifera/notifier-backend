@@ -11,6 +11,7 @@ async function createApp(req) {
     name: { $regex: regexPattern },
     is_deleted: false,
   });
+
   if (appExists)
     throw new ConflictError('Application with the same name already exists');
 
@@ -112,6 +113,7 @@ async function updateApp(id, obj) {
     const appExists = await Application.find({
       name: { $regex: regexPattern },
       is_deleted: false,
+      _id: { $ne: id },
     });
 
     if (appExists.length > 0)

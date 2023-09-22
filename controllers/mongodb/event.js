@@ -131,6 +131,7 @@ async function updateEvent(id, obj) {
       name: { $regex: regexPattern },
       application: event.application,
       is_deleted: false,
+      _id: { $ne: id },
     });
 
     if (eventExists)

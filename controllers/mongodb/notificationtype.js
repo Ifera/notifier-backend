@@ -136,6 +136,7 @@ async function updateNotificationType(id, obj) {
       name: { $regex: regexPattern },
       event: notif.event,
       is_deleted: false,
+      _id: { $ne: id },
     });
 
     if (notifExists)
