@@ -1,6 +1,7 @@
 const Joi = require('joi');
 const { BadRequest } = require('../utils/error');
 const { USE_MONGO_DB } = require('../globals');
+const { trim } = require('../utils');
 
 module.exports.validateQueryParams = (validator) => (req, res, next) => {
   const { error } = validator(req.query);
@@ -9,7 +10,7 @@ module.exports.validateQueryParams = (validator) => (req, res, next) => {
 };
 
 module.exports.validateReq = (validator) => (req, res, next) => {
-  const { error } = validator(req.body);
+  const { error } = validator(trim(req.body));
   if (error) throw new BadRequest(error.details[0].message);
   next();
 };
