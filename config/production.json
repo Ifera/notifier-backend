@@ -13,7 +13,7 @@
     "type": "mongodb",
 
     "mongodb": {
-      "uri": "mongodb+srv://tayyabrashid:pass123@cluster0.tpol0xt.mongodb.net/notifier_dev"
+      "uri": "mongodb+srv://<user>:<pass>@cluster0.tpol0xt.mongodb.net/notifier_dev"
     },
 
     "postgres": {
